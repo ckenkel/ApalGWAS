@@ -17,7 +17,8 @@ Files in this repository
 	  - KINest.sh
 	  
 	- Input files:
-	  - Phenotypes.tab
+	  - SamplesKINGuniq.txt
+      - Phenotypes.tab
 	  - AllCHR_ExptIMPfilt_plus66_Merge_Filt_dummyID_binary_fileset_KINGrelate_GEMMA_plusSelfs.tab
 	
 2. RuthGates_SiteMap_vGWAS.qmd: Annotated R script for generating site map as shown in Figure 1
