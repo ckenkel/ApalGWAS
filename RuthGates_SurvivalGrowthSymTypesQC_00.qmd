@@ -1,0 +1,656 @@
+---
+title: "Ruth Gates Analysis and Figures Part 0: Exploratory Plots, merging and QC"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Load all of the needed libraries.
+
+```{r}
+
+#install.packages("nationalparkcolors")
+
+# Graphical tools :
+library(ggplot2)
+library(cowplot)
+#library(nationalparkcolors)
+
+# Data Wrangling :
+library(dplyr)
+library(tidyr)
+library(forcats)
+library(car)
+library(naniar)
+
+```
+
+## Read in trait data, convert numeric IDs to factors
+
+```{r}
+
+traitsRaw<-read.csv("~/Dropbox/CarlsLab/ResearchProjects/NOAA_RuthGates/TraitData/GMMetadataFinal_FinalMetaData_29Apr24.csv",header = T,stringsAsFactors=TRUE,na.strings=NA)
+
+head(traitsRaw)
+
+summary(traitsRaw) 
+
+#Confirm origin information was correctly transcribed
+
+traitsRaw %>%
+  filter(Origin=="Elbow, Horseshoe batch crosses") #yes, matches SRA metadata - 1 genet
+
+traitsRaw %>%
+  filter(Origin=="Elbow batch cross") #yes, matches SRA metadata - 3 genets
+
+traitsRaw %>%
+  filter(Genet=="29") #yes, matches SRA metadata
+
+#moving on, convert numeric IDs to factors
+
+traitsRaw$SampleID<- as.factor(traitsRaw$SampleID)
+traitsRaw$Genet<- as.factor(traitsRaw$Genet)
+traitsRaw$Ramet<- as.factor(traitsRaw$Ramet)
+traitsRaw$Rack<- as.factor(traitsRaw$Rack)
+
+summary(traitsRaw) 
+
+```
+
+## Calculate growth, change in Fv/Fm, partial mortality
+
+```{r}
+
+traitsRaw$SA_dif<-traitsRaw$SA_F_Growth-traitsRaw$SA_I #max surface area obtained during expt is difference between max skeletal area and initial
+traitsRaw$PartMort<-traitsRaw$SA_F_Growth-traitsRaw$SA_F_Tissue #partial mortality is difference between max skeletal area and live tissue at end
+traitsRaw$FvFm_PropDif<-(traitsRaw$FvFm_Final_withNA-traitsRaw$FvFm_Initial)/traitsRaw$FvFm_Initial #proportion change in Fv/Fm is final, accounting for dead guys (withNA), minus initial divided by initial
+
+traitsRaw$NPQ_PropDif<-(traitsRaw$NPQ_Final_withNA-traitsRaw$NPQ_Initial)/traitsRaw$NPQ_Initial #proportion change in NPQ is final, accounting for dead guys (withNA), minus initial divided by initial
+
+traitsRaw$ETR.Max_PropDif<-(traitsRaw$ETR_Final_withNA-traitsRaw$ETR.Max_Initial)/traitsRaw$ETR.Max_Initial #proportion change in Fv/Fm is final, accounting for dead guys (withNA), minus initial divided by initial
+
+traitsRaw$DailyGrowthRate<-(traitsRaw$Davies1989_WeightFinal-traitsRaw$Davies1989_WeightInitial)/traitsRaw$SamplingTime_Survival #Daily Weight Gain is final minus initial accounting for different experimental durations (not all coral could be weighed on the same day)
+
+summary(traitsRaw) #NAs appear to make sense
+
+```
+
+## Now for some exploratory plots and QC
+
+```{r}
+
+#Surface area
+
+table(traitsRaw$Genet) #reps for everyone present
+
+hist(traitsRaw$SA_dif, breaks=20)
+
+traitsRaw %>%
+  count(SA_dif < 0) #10 NA, 1 TRUE - who are these?
+
+traitsRaw %>%
+  filter(SA_dif < 0) #117.5 - initial SA is 1.4, final is 1.3 ...seems like a scaling thing. Re-trace does not change. Can still trust partial mortality but should kill this measure
+
+traitsRaw$SA_dif_cor <- replace(traitsRaw$SA_dif, traitsRaw$SA_dif < 0, NA)
+
+summary(traitsRaw)
+hist(traitsRaw$SA_dif_cor, breaks=20) #all positive now
+
+traitsRaw %>%
+  filter(SA_dif_cor > 1) %>%
+  pull(SampleID) #lets just double check extreme growth dudes - re-traced - these are in fact beasts
+
+traitsRaw %>%
+  filter(Treatment=="Control") %>%
+  ggplot(aes(x = fct_reorder(Genet, SA_dif_cor), y = SA_dif_cor)) + 
+  geom_boxplot(fill='grey60') #Does seem to be genet specific diffs in performance
+
+
+traitsRaw %>%
+  filter(Treatment=="Heat") %>%
+  ggplot(aes(x = fct_reorder(Genet, SA_dif_cor), y = SA_dif_cor)) + 
+  geom_boxplot(fill='grey60')
+
+```
+
+```{r}
+
+## Partial Mortality
+
+traitsRaw %>%
+  count(PartMort < 0) #3 NA, all good
+
+hist(traitsRaw$PartMort, breaks=20) #long tail
+
+traitsRaw %>%
+  filter(Treatment=="Control") %>%
+  ggplot(aes(x = fct_reorder(Genet, PartMort), y = PartMort)) + 
+  geom_boxplot(fill='grey60') #Does seem to be genet specific diffs in performance, but mostly zero in control
+
+
+traitsRaw %>%
+  filter(Treatment=="Heat") %>%
+  ggplot(aes(x = fct_reorder(Genet, PartMort), y = PartMort)) + 
+  geom_boxplot(fill='grey60') #very clear treatment effect in addition to genet interaction - some still low with many very high
+
+
+```
+
+```{r}
+
+## Growth Rate
+
+traitsRaw %>%
+  count(DailyGrowthRate < 0) #5 NA, 31 TRUE
+
+traitsRaw %>%
+  filter(DailyGrowthRate < 0) #weight loss is possible, esp with partial mortality and potential for skeletal dissolution
+
+hist(traitsRaw$DailyGrowthRate, breaks=20) #most values very close to zero...but some weird outliers
+
+```
+
+#Does Daily Growth scale with partial mortality or increase SA (naive expectation is that it should)
+
+```{r}
+
+traitsRaw %>%
+  ggplot(aes(x = PartMort, y = DailyGrowthRate)) + 
+  geom_point(fill='grey60') #not really - outliers not related to increased partial mortality which we CAN verify bc image record
+
+traitsRaw %>%
+  ggplot(aes(x = SA_dif_cor, y = DailyGrowthRate)) + 
+  geom_point(fill='grey60') #also not really
+
+```
+
+#Suggests that outliers are measurement error - incorrect transcription (has this been checked? yes)
+
+```{r}
+
+traitsRaw %>%
+  ggplot(aes(x = Genet, y = DailyGrowthRate)) + 
+  geom_boxplot(fill='grey60') 
+
+```
+
+Not really systematic by genet. Suggests that outliers are measurement error
+
+```{r}
+
+traitsRaw %>%
+  ggplot(aes(x = Rack, y = DailyGrowthRate)) + 
+  geom_boxplot(fill='grey60') #seems like rack could be a factor
+
+```
+
+Seems like rack could be a factor, but presumably coral were weighted by rack over time
+
+```{r}
+
+traitsRaw %>%
+  ggplot(aes(x = Raceway, y = DailyGrowthRate)) + 
+  geom_boxplot(fill='grey60') 
+
+```
+
+DEFINITELY by raceway - see 5S - could it also be explained by date?
+
+```{r}
+
+traitsRaw %>%
+  ggplot(aes(x = Date_finalBW, y = DailyGrowthRate)) + 
+  geom_boxplot(fill='grey60') 
+
+```
+
+oh yeah, May 9 has greater spread, 4/28 also systematically low Lets check initials and then try to pull outliers
+
+```{r}
+
+traitsRaw %>%
+  ggplot(aes(x = Date_initialBW, y = DailyGrowthRate)) + 
+  geom_boxplot(fill='grey60') #April 1 and 2 also showing big spreads for initial
+
+table(traitsRaw$Date_finalBW) #only 79 samples run on May 9
+
+#Lets double check a few outliers
+
+traitsRaw %>%
+  filter(DailyGrowthRate < 0) %>%
+  filter(Date_finalBW=="9-May") %>%
+  pull(SampleID)
+
+traitsRaw %>%
+  filter(DailyGrowthRate < 0 | DailyGrowthRate > 0.01) %>%
+  filter(Date_finalBW=="7-May") %>%
+  count(Time_finalBW)
+
+#NOTE that SEVERAL outliers were recorded at suspisciously similar times (wind or bad calibration?)
+#other dates?
+
+##7-May - 10/11 overlapping times
+
+##8-May - ALL DIFFERENT, only 3
+traitsRaw %>%
+  filter(DailyGrowthRate < 0 | DailyGrowthRate > 0.01) %>%
+  filter(Date_finalBW=="8-May") %>%
+  count(Time_finalBW)
+
+##9-May - LOTS
+traitsRaw %>%
+  filter(DailyGrowthRate < 0 | DailyGrowthRate > 0.01) %>%
+  filter(Date_finalBW=="9-May") %>%
+  count(Time_finalBW)
+#10:20 - 1 below zero, 2 above 0.01
+#11:00 - 4 below zero, 1 above 0.01
+#12:00 - 1 below zero, 1 above 0.01
+#12:25 - 1 below zero
+#2:49 - 1 below zero, 2 above 0.01
+
+##10-May - both at 10:20
+traitsRaw %>%
+  filter(DailyGrowthRate < 0 | DailyGrowthRate > 0.01) %>%
+  filter(Date_finalBW=="10-May") %>%
+  count(Time_finalBW)
+
+##11-May - 2 at 10:39, rest unique
+traitsRaw %>%
+  filter(DailyGrowthRate < 0 | DailyGrowthRate > 0.01) %>%
+  filter(Date_finalBW=="11-May") %>%
+  count(Time_finalBW)
+
+##12-May - 4 unique
+traitsRaw %>%
+  filter(DailyGrowthRate < 0 | DailyGrowthRate > 0.01) %>%
+  filter(Date_finalBW=="12-May") %>%
+  count(Time_finalBW)
+
+##13-May - 2 at 13:05
+traitsRaw %>%
+  filter(DailyGrowthRate < 0 | DailyGrowthRate > 0.01) %>%
+  filter(Date_finalBW=="13-May") %>%
+  count(Time_finalBW)
+
+#PROPOSAL - discard extreme outliers which occur at overlapping timepoints. suggests random measurement error
+#Define extreme with the interquartile range criterion
+
+traitsRaw %>%
+  filter(DailyGrowthRate < 0 | DailyGrowthRate > 0.01) %>%
+  filter(Date_finalBW=="13-May") %>%
+  count(Time_finalBW)
+
+outliers <- boxplot.stats(traitsRaw$DailyGrowthRate)$out #45 outliers
+out_ind <- which(traitsRaw$DailyGrowthRate %in% c(outliers))
+
+traitsRaw %>%
+  slice(out_ind) %>%
+  count(Date_finalBW) #lots of daily overlap, esp 9 May. Remove any outliers prior to final weighing bc all done at same time = values on 4/28 (only 5 weights total), 4/29 (only 16 weights total) and 5/4 (only 19 weights total)
+
+traitsRaw %>%
+  count(Date_finalBW)
+
+traitsRaw %>%
+  slice(out_ind) %>%
+  filter(Date_finalBW=="7-May") %>%
+  count(Time_finalBW) #2 at 250, 2 at 415, 3 at 435
+
+#none overlapping May 8
+
+traitsRaw %>%
+  slice(out_ind) %>%
+  filter(Date_finalBW=="9-May") %>%
+  count(Time_finalBW) #ALL overlapping - must remove
+
+traitsRaw %>%
+  slice(out_ind) %>%
+  filter(Date_finalBW=="10-May") %>%
+  count(Time_finalBW) #all overlapping, must remove
+
+
+traitsRaw %>%
+  slice(out_ind) %>%
+  filter(Date_finalBW=="11-May") %>%
+  count(Time_finalBW) #overlap at 10:39 only
+
+#no overlap on 12 May
+
+traitsRaw %>%
+  slice(out_ind) %>%
+  filter(Date_finalBW=="13-May") %>%
+  count(Time_finalBW) #2 overlapping at 1305
+
+#rownames of this overlapping subset
+out_ind_final<-c(17,22,43, 47,  89,  96, 176,179, 185, 251, 256, 268, 269,311, 322, 371, 389, 502, 556, 558, 568, 574, 585, 603, 609, 626, 715, 716, 738, 768, 799,822, 847, 924)
+
+traitsRaw %>%
+  slice(out_ind_final) #confirm list of final outliers to replace with NA in new column
+
+traitsRaw$DailyGrowthRate_cor <- replace(traitsRaw$DailyGrowthRate, rownames(traitsRaw) %in% out_ind_final, NA)
+
+traitsRaw %>%
+  slice(out_ind) #spot check to confirm replacement worked
+
+#secondarily check for overlap in initial time of weighing
+
+traitsRaw %>%
+  slice(out_ind)%>%
+  filter(!is.na(DailyGrowthRate_cor)) %>%
+  count(Date_initialBW) #overlap on some days - screen days
+
+traitsRaw %>%
+  slice(out_ind)%>%
+  filter(!is.na(DailyGrowthRate_cor)) %>%
+  filter(Date_initialBW=="3/28/22") %>%
+  count(Time_initialBW) #none
+
+traitsRaw %>%
+  slice(out_ind)%>%
+  filter(!is.na(DailyGrowthRate_cor)) %>%
+  filter(Date_initialBW=="3/29/22") %>%
+  count(Time_initialBW) # 2 at 14:12!!
+
+traitsRaw %>%
+  slice(out_ind)%>%
+  filter(!is.na(DailyGrowthRate_cor)) %>%
+  filter(Date_initialBW=="3/30/22") %>%
+  count(Time_initialBW) # none
+
+traitsRaw %>%
+  slice(out_ind)%>%
+  filter(!is.na(DailyGrowthRate_cor)) %>%
+  filter(Date_initialBW=="4/1/22") %>%
+  count(Time_initialBW) #none
+
+#rownames of this overlapping subset - redo with the additional 2 rows:
+out_ind_final<-c(17,22,43, 47,  89,  96, 176,179, 185, 251, 256, 268, 269,311, 322, 371, 389, 500,502, 556, 558, 568, 574, 585, 603, 609, 626, 715, 716, 738, 742, 768, 799,822, 847, 924)
+
+traitsRaw$DailyGrowthRate_cor <- replace(traitsRaw$DailyGrowthRate, rownames(traitsRaw) %in% out_ind_final, NA)
+
+traitsRaw %>%
+  slice(out_ind) #spot check to confirm replacement worked - all good, moving on
+
+traitsRaw %>%
+  ggplot(aes(x = Date_finalBW, y = DailyGrowthRate_cor)) + 
+  geom_boxplot(fill='grey60') #4/28 still quite low, but outlier spread much better on avg
+
+```
+
+#PAM - Fv/Fm
+
+```{r}
+
+## PAM
+
+#Fv/Fm - Quantum Yield
+traitsRaw %>%
+  count(FvFm_PropDif < 0) #many are negative
+
+hist(traitsRaw$FvFm_PropDif, breaks=20) #but very normally distributed
+
+traitsRaw %>%
+  ggplot(aes(x = Raceway, y = FvFm_PropDif)) + 
+  geom_boxplot(fill='grey60') 
+
+```
+
+Very strong raceway signal, but outliers don't appear systematically different
+
+```{r}
+
+traitsRaw %>%
+  ggplot(aes(x = RunDate_initialPAM, y = FvFm_PropDif)) + 
+  geom_boxplot(fill='grey60') #appears different among initial run days
+
+traitsRaw %>%
+  ggplot(aes(x = RunDate_finalPAM, y = FvFm_PropDif)) + 
+  geom_boxplot(fill='grey60') #bigger diff among final days, but this could be conflated with when treatments were run
+
+traitsRaw %>%
+  filter(Treatment=="Control") %>%
+  ggplot(aes(x = fct_reorder(Genet, FvFm_PropDif), y = FvFm_PropDif)) + 
+  geom_boxplot(fill='grey60') #Does seem to be genet specific diffs in performance
+#controls are largely negative
+
+```
+
+Seem to be genet specific differences in performance. But controls all show a neutral or negative change in FvFm = decline Is this just photoacclimation?
+
+```{r}
+
+traitsRaw %>%
+  filter(Treatment=="Heat") %>%
+  ggplot(aes(x = fct_reorder(Genet, FvFm_PropDif), y = FvFm_PropDif)) + 
+  geom_boxplot(fill='grey60')
+#Heats all neutral or increased in FvFm
+
+```
+
+Which suggests heats are improving...or at the very least syms not impaired?
+
+#PAM - Non-photochemical quenching
+
+```{r}
+
+#Non Photochemical quenching
+traitsRaw %>%
+  count(NPQ_PropDif < 0) #many are negative
+
+hist(traitsRaw$NPQ_PropDif, breaks=20) #some very big outliers
+
+traitsRaw %>%
+  ggplot(aes(x = Raceway, y = NPQ_PropDif)) + 
+  geom_boxplot(fill='grey60') 
+
+```
+
+ALL outliers in 6S...is there an issue by date?
+
+```{r}
+
+traitsRaw %>%
+  filter(NPQ_PropDif > 0) %>%
+  filter(Raceway=="6S") %>%
+  count(Rack) 
+
+```
+
+Yes, should double check NPQ for these racks where there are many outliers?
+
+#PAM - Electron transport rate
+
+```{r}
+
+#ETRm
+traitsRaw %>%
+  count(ETR.Max_PropDif < 0) #many are negative
+
+hist(traitsRaw$ETR.Max_PropDif, breaks=20) #but very normally distributed
+
+traitsRaw %>%
+  ggplot(aes(x = Raceway, y = ETR.Max_PropDif)) + 
+  geom_boxplot(fill='grey60') #
+
+```
+
+Raceway signal, but outliers don't appear systematically different
+
+```{r}
+
+traitsRaw %>%
+  ggplot(aes(x = RunDate_initialPAM, y = ETR.Max_PropDif)) + 
+  geom_boxplot(fill='grey60') #somewhat different among initial run days
+
+```
+
+Raceway signal, but outliers don't appear systematically different
+
+```{r}
+
+traitsRaw %>%
+  ggplot(aes(x = RunDate_finalPAM, y = ETR.Max_PropDif)) + 
+  geom_boxplot(fill='grey60') 
+
+```
+
+Somewhat different among final days
+
+```{r}
+
+traitsRaw %>%
+  filter(Treatment=="Control") %>%
+  ggplot(aes(x = fct_reorder(Genet, ETR.Max_PropDif), y = ETR.Max_PropDif)) + 
+  geom_boxplot(fill='grey60') 
+
+```
+
+Does seem to be genet specific diffs in performance similar to Fv/Fm But controls all show a neutral or negative change in ETRm
+
+```{r}
+
+traitsRaw %>%
+  filter(Treatment=="Heat") %>%
+  ggplot(aes(x = fct_reorder(Genet, ETR.Max_PropDif), y = ETR.Max_PropDif)) + 
+  geom_boxplot(fill='grey60')
+
+```
+
+Heats also mostly negative, not same as Fv/Fm
+
+## Now we need to import the qPCR data, which are another subset of the trait data and merge
+
+```{r}
+SymDatRaw<-read.csv("~/Dropbox/CarlsLab/ResearchProjects/NOAA_RuthGates/TraitData/RG_sym_host_Tech_Reps_Averaged_NewCorrectionCalc_plusCV.csv",header = T,stringsAsFactors=TRUE,na.strings=NA)
+
+head(SymDatRaw)
+
+summary(SymDatRaw) 
+
+SymDatRaw$Sample<-as.factor(SymDatRaw$Sample)
+
+table(SymDatRaw$Sample) #how many reps for everyone present?
+
+summary(SymDatRaw)
+
+```
+
+#Duplicate rows for 12.2 - Sibelle confirms labeling error
+
+```{r}
+
+traitsRaw %>%
+  filter(Genet == "12") #ALL heat treated ramets died prior to end of expt ...?
+
+SymDatRaw %>% #lets pull all possible 12 ramets from qPCR data
+  filter(Sample == "12.1" | Sample == "12.2" | Sample == "12.3" | Sample == "12.4" | Sample == "12.5" | Sample == "12.6" )
+
+#measures exist for all ramets; and 12.2 is clearly not a duplicate as D value is very different. Must toss all 12.2s due to ambiguity
+
+SymDatRaw_noDups<-SymDatRaw %>%
+  filter(Sample != "12.2")
+
+summary(SymDatRaw_noDups) #clean for now, and most tech reps super tight, but there are some weirdos on the high end
+
+#Do high CV weirdos scale with mean Cq? Would expect variance to increase as we get to single molecule stage amplifications
+
+plot(CqH_CV~CqH_avg,SymDatRaw_noDups) #no, some extreme outliers are actually at pretty low mean Cq values for host
+
+plot(CqD_CV~CqD_avg,SymDatRaw_noDups) #yes, there is a clear set of Cqs with high variance in the 35-40 range
+
+plot(CqC_CV~CqC_avg,SymDatRaw_noDups) #same for C, variance gets bigger approaching the 35-40 range
+
+plot(CqA_CV~CqA_avg,SymDatRaw_noDups) #one odd outlier at lower Cq, rest are in that 35-40 margin 
+
+```
+
+#Need to filter for these ambiguous technical replicates - will kill any sample with CV of Cqs greater than 20%. And also instances where host Cq is too high for confident measure (\>28 cycles)
+
+```{r}
+
+SymDatRaw_noDups_cleanCq<-SymDatRaw_noDups %>%
+  filter(CqH_CV < 20) %>%
+  filter(CqD_CV < 20) %>%
+  filter(CqC_CV < 20) %>%
+  filter(CqA_CV < 20) %>%
+  filter(CqH_avg < 28)
+
+summary(SymDatRaw_noDups_cleanCq) #looking better
+
+plot(CqH_CV~CqH_avg,SymDatRaw_noDups_cleanCq) 
+
+```
+
+#merge the datasets - there will be slightly fewer qPCR samples than final trait samples we assume...but lets do full join to check
+
+```{r}
+
+traitsAll<-full_join(traitsRaw,SymDatRaw_noDups_cleanCq, by = c("SampleID" = "Sample"))
+
+summary(traitsAll) #There are NAs in Treatment - Sibelle confirms this is result of mislabeling during DNA extractions
+
+traitsAll %>%
+  filter(is.na(Treatment))%>%
+  pull(SampleID) #43.7  34.2  151.6 27.7  168.6 9.1   9.3
+
+traitsRaw %>%
+  filter(Genet=="43") #43.7 doesn't exist in original traits dataset
+
+traitsAll %>%
+  filter(Genet=="43") #data for reps 1-6 are there; qPCR data missing for 43.1 and 43.3
+
+# 43.1 and 43.3 are both controls - therefore can safely assume 43.7 is 43.1 as it will be a control value and still correct for the purposes of calculating mean genet trait value
+
+traitsRaw %>%
+  filter(Genet=="34") #there is no genet 34
+
+traitsRaw %>%
+  filter(Genet=="151") #there is no genet 151
+
+traitsRaw %>%
+  filter(Genet=="168") #there is no genet 168
+
+traitsRaw %>%
+  filter(Genet=="9") #there is no genet 9
+
+#Will have to toss the incorrect genets
+
+```
+
+#Correcting genet ID for 43, remerging and tossing mislabeled genet IDs
+
+```{r}
+head(SymDatRaw_noDups_cleanCq)
+
+SymDatRaw_noDups_cleanCq[SymDatRaw_noDups_cleanCq$Sample=='43.7',] #figure out row number
+
+SymDatRaw_noDups_cleanCq$Sample<-as.character(SymDatRaw_noDups_cleanCq$Sample) #convert to character
+
+SymDatRaw_noDups_cleanCq[159,1]<-43.1 #fix ramet ID
+
+SymDatRaw_noDups_cleanCq$Sample<-as.factor(SymDatRaw_noDups_cleanCq$Sample) #revert to factor
+  
+summary(SymDatRaw_noDups_cleanCq)
+
+traitsAll<-full_join(traitsRaw,SymDatRaw_noDups_cleanCq, by = c("SampleID" = "Sample"))
+
+summary(traitsAll) #Now there are 6 NAs for Treatment as expected. Toss the rest
+
+traitsAll_fix<-traitsAll %>%
+  filter(Treatment != "")
+
+summary(traitsAll_fix) #good
+
+```
+
+#Finally, export clean trait data for S:H and sym type analyses
+
+```{r}
+
+saveRDS(traitsAll_fix,file="traitsFiltered_SymTypeSubset.rds")
+
+```

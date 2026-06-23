@@ -1,0 +1,428 @@
+##fileformat=VCFv4.2
+##FILTER=<ID=PASS,Description="All filters passed">
+##filedate=20250421
+##source="beagle.29Oct24.c8e.jar"
+##INFO=<ID=AF,Number=A,Type=Float,Description="Estimated ALT Allele Frequencies">
+##INFO=<ID=DR2,Number=A,Type=Float,Description="Dosage R-Squared: estimated squared correlation between estimated REF dose [P(RA) + 2*P(RR)] and true REF dose">
+##INFO=<ID=IMP,Number=0,Type=Flag,Description="Imputed marker">
+##INFO=<ID=END,Number=1,Type=Integer,Description="End position of the variant described in this record  (for use with symbolic alleles)">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=DS,Number=A,Type=Float,Description="estimated ALT dose [P(RA) + 2*P(AA)]">
+##FORMAT=<ID=GP,Number=G,Type=Float,Description="Estimated Genotype Probability">
+##contig=<ID=OZ034921.1>
+##bcftools_filterVersion=1.21+htslib-1.21
+##bcftools_filterCommand=filter -e INFO/DR2<0.99 -W=tbi -Oz -o OZ034921.1_GL_allLoci_realign_IGP099_IMP_DR2099.vcf.gz OZ034921.1_GL_allLoci_realign_IGP099_IMP.vcf.gz.vcf.gz; Date=Mon May 19 09:48:15 2025
+##bcftoolsVersion=1.21+htslib-1.21
+##bcftoolsCommand=mpileup -f /project/ckenkel_26/RefSeqs/ApalGenome/ApalmGenome_vSanger/GCA_964030605.1/GCA_964030605.1_jaAcrPala1.1_genomic.fna -q 40 -Q 20 -Ou -A -a FORMAT/AD,FORMAT/ADF,FORMAT/ADR,FORMAT/DP,FORMAT/SP,INFO/AD,INFO/ADF,INFO/ADR 21073D-02-01_S97_L002.host.marked_duplicates.bam
+##reference=file:///project/ckenkel_26/RefSeqs/ApalGenome/ApalmGenome_vSanger/GCA_964030605.1/GCA_964030605.1_jaAcrPala1.1_genomic.fna
+##contig=<ID=OZ034922.1,length=28171721>
+##contig=<ID=OZ034923.1,length=26531820>
+##contig=<ID=OZ034924.1,length=24502734>
+##contig=<ID=OZ034925.1,length=24464178>
+##contig=<ID=OZ034926.1,length=23669023>
+##contig=<ID=OZ034927.1,length=22572888>
+##contig=<ID=OZ034928.1,length=22532390>
+##contig=<ID=OZ034929.1,length=22289718>
+##contig=<ID=OZ034930.1,length=22116133>
+##contig=<ID=OZ034931.1,length=21622140>
+##contig=<ID=OZ034932.1,length=21083087>
+##contig=<ID=OZ034933.1,length=19775986>
+##contig=<ID=OZ034934.1,length=18272776>
+##contig=<ID=CAXIPZ010000001.1,length=12090>
+##contig=<ID=CAXIPZ010000002.1,length=16186>
+##contig=<ID=CAXIPZ010000003.1,length=26413>
+##contig=<ID=CAXIPZ010000004.1,length=24166>
+##contig=<ID=CAXIPZ010000005.1,length=20244>
+##contig=<ID=CAXIPZ010000006.1,length=22567>
+##contig=<ID=CAXIPZ010000007.1,length=15839>
+##contig=<ID=CAXIPZ010000008.1,length=23242>
+##contig=<ID=CAXIPZ010000009.1,length=18953>
+##contig=<ID=CAXIPZ010000010.1,length=16151>
+##contig=<ID=CAXIPZ010000011.1,length=17679>
+##contig=<ID=CAXIPZ010000012.1,length=12983>
+##contig=<ID=CAXIPZ010000013.1,length=19666>
+##contig=<ID=CAXIPZ010000014.1,length=26014>
+##contig=<ID=CAXIPZ010000015.1,length=19498>
+##contig=<ID=CAXIPZ010000016.1,length=17561>
+##contig=<ID=CAXIPZ010000017.1,length=13841>
+##contig=<ID=CAXIPZ010000018.1,length=21926>
+##contig=<ID=CAXIPZ010000019.1,length=17124>
+##contig=<ID=CAXIPZ010000020.1,length=17608>
+##contig=<ID=CAXIPZ010000021.1,length=17953>
+##contig=<ID=CAXIPZ010000022.1,length=1000>
+##contig=<ID=CAXIPZ010000023.1,length=16761>
+##contig=<ID=CAXIPZ010000024.1,length=1000>
+##contig=<ID=CAXIPZ010000025.1,length=30204>
+##contig=<ID=CAXIPZ010000026.1,length=21399>
+##contig=<ID=CAXIPZ010000027.1,length=23143>
+##contig=<ID=CAXIPZ010000028.1,length=13770>
+##contig=<ID=CAXIPZ010000029.1,length=24793>
+##contig=<ID=CAXIPZ010000030.1,length=16418>
+##contig=<ID=CAXIPZ010000031.1,length=18420>
+##contig=<ID=CAXIPZ010000032.1,length=18933>
+##contig=<ID=CAXIPZ010000033.1,length=19122>
+##contig=<ID=CAXIPZ010000034.1,length=16861>
+##contig=<ID=CAXIPZ010000035.1,length=27769>
+##contig=<ID=CAXIPZ010000036.1,length=15171>
+##contig=<ID=CAXIPZ010000037.1,length=24040>
+##contig=<ID=CAXIPZ010000038.1,length=22540>
+##contig=<ID=CAXIPZ010000039.1,length=20383>
+##contig=<ID=CAXIPZ010000040.1,length=28356>
+##contig=<ID=CAXIPZ010000041.1,length=12656>
+##contig=<ID=CAXIPZ010000042.1,length=14366>
+##contig=<ID=CAXIPZ010000043.1,length=22625>
+##contig=<ID=CAXIPZ010000044.1,length=18880>
+##contig=<ID=CAXIPZ010000045.1,length=17666>
+##contig=<ID=CAXIPZ010000046.1,length=15867>
+##contig=<ID=CAXIPZ010000047.1,length=30628>
+##contig=<ID=CAXIPZ010000048.1,length=16343>
+##contig=<ID=CAXIPZ010000049.1,length=14695>
+##contig=<ID=CAXIPZ010000050.1,length=17676>
+##contig=<ID=CAXIPZ010000051.1,length=19837>
+##contig=<ID=CAXIPZ010000052.1,length=17952>
+##contig=<ID=CAXIPZ010000053.1,length=13474>
+##contig=<ID=CAXIPZ010000054.1,length=18133>
+##contig=<ID=CAXIPZ010000055.1,length=24467>
+##contig=<ID=CAXIPZ010000056.1,length=44474>
+##contig=<ID=CAXIPZ010000057.1,length=19241>
+##contig=<ID=CAXIPZ010000058.1,length=15233>
+##contig=<ID=CAXIPZ010000059.1,length=1000>
+##contig=<ID=CAXIPZ010000060.1,length=21293>
+##contig=<ID=CAXIPZ010000061.1,length=16152>
+##contig=<ID=CAXIPZ010000062.1,length=28948>
+##contig=<ID=CAXIPZ010000063.1,length=22067>
+##contig=<ID=CAXIPZ010000064.1,length=1000>
+##contig=<ID=CAXIPZ010000065.1,length=19686>
+##contig=<ID=CAXIPZ010000066.1,length=22092>
+##contig=<ID=CAXIPZ010000067.1,length=16111>
+##contig=<ID=CAXIPZ010000068.1,length=25446>
+##contig=<ID=CAXIPZ010000069.1,length=13320>
+##contig=<ID=CAXIPZ010000070.1,length=23235>
+##contig=<ID=CAXIPZ010000071.1,length=29029>
+##contig=<ID=CAXIPZ010000072.1,length=19380>
+##contig=<ID=CAXIPZ010000073.1,length=29544>
+##contig=<ID=CAXIPZ010000074.1,length=19061>
+##contig=<ID=CAXIPZ010000075.1,length=19319>
+##contig=<ID=CAXIPZ010000076.1,length=12146>
+##contig=<ID=CAXIPZ010000077.1,length=19667>
+##contig=<ID=CAXIPZ010000078.1,length=28580>
+##contig=<ID=CAXIPZ010000079.1,length=20661>
+##contig=<ID=CAXIPZ010000080.1,length=16586>
+##contig=<ID=CAXIPZ010000081.1,length=19771>
+##contig=<ID=CAXIPZ010000082.1,length=17521>
+##contig=<ID=CAXIPZ010000083.1,length=24288>
+##contig=<ID=CAXIPZ010000084.1,length=27213>
+##contig=<ID=CAXIPZ010000085.1,length=14391>
+##contig=<ID=CAXIPZ010000086.1,length=16562>
+##contig=<ID=CAXIPZ010000087.1,length=13496>
+##contig=<ID=CAXIPZ010000088.1,length=21916>
+##contig=<ID=CAXIPZ010000089.1,length=16823>
+##contig=<ID=CAXIPZ010000090.1,length=26045>
+##contig=<ID=CAXIPZ010000091.1,length=3000>
+##contig=<ID=CAXIPZ010000092.1,length=26676>
+##contig=<ID=CAXIPZ010000093.1,length=25163>
+##contig=<ID=CAXIPZ010000094.1,length=15487>
+##contig=<ID=CAXIPZ010000095.1,length=46240>
+##contig=<ID=CAXIPZ010000096.1,length=10221>
+##contig=<ID=CAXIPZ010000097.1,length=16178>
+##contig=<ID=CAXIPZ010000098.1,length=16983>
+##contig=<ID=CAXIPZ010000099.1,length=22219>
+##contig=<ID=CAXIPZ010000100.1,length=21520>
+##contig=<ID=CAXIPZ010000101.1,length=19396>
+##contig=<ID=CAXIPZ010000102.1,length=23206>
+##contig=<ID=CAXIPZ010000103.1,length=21150>
+##contig=<ID=CAXIPZ010000104.1,length=14098>
+##contig=<ID=CAXIPZ010000105.1,length=15795>
+##contig=<ID=CAXIPZ010000106.1,length=20033>
+##contig=<ID=CAXIPZ010000107.1,length=21189>
+##contig=<ID=CAXIPZ010000108.1,length=19600>
+##contig=<ID=CAXIPZ010000109.1,length=18216>
+##contig=<ID=CAXIPZ010000110.1,length=19324>
+##contig=<ID=CAXIPZ010000111.1,length=13089>
+##contig=<ID=CAXIPZ010000112.1,length=14033>
+##contig=<ID=CAXIPZ010000113.1,length=34994>
+##contig=<ID=CAXIPZ010000114.1,length=12785>
+##contig=<ID=CAXIPZ010000115.1,length=19293>
+##contig=<ID=CAXIPZ010000116.1,length=19248>
+##contig=<ID=CAXIPZ010000117.1,length=22071>
+##contig=<ID=CAXIPZ010000118.1,length=19341>
+##contig=<ID=CAXIPZ010000119.1,length=17984>
+##contig=<ID=CAXIPZ010000120.1,length=17264>
+##contig=<ID=CAXIPZ010000121.1,length=22634>
+##contig=<ID=CAXIPZ010000122.1,length=16289>
+##contig=<ID=CAXIPZ010000123.1,length=20652>
+##contig=<ID=CAXIPZ010000124.1,length=22376>
+##contig=<ID=CAXIPZ010000125.1,length=26858>
+##contig=<ID=CAXIPZ010000126.1,length=21658>
+##contig=<ID=CAXIPZ010000127.1,length=10228>
+##contig=<ID=CAXIPZ010000128.1,length=2000>
+##contig=<ID=CAXIPZ010000129.1,length=18473>
+##contig=<ID=CAXIPZ010000130.1,length=18548>
+##contig=<ID=CAXIPZ010000131.1,length=16161>
+##contig=<ID=CAXIPZ010000132.1,length=18345>
+##contig=<ID=CAXIPZ010000133.1,length=51594>
+##contig=<ID=CAXIPZ010000134.1,length=17722>
+##contig=<ID=CAXIPZ010000135.1,length=14827>
+##contig=<ID=CAXIPZ010000136.1,length=3000>
+##contig=<ID=CAXIPZ010000137.1,length=26249>
+##contig=<ID=CAXIPZ010000138.1,length=20224>
+##contig=<ID=CAXIPZ010000139.1,length=19020>
+##contig=<ID=CAXIPZ010000140.1,length=18147>
+##contig=<ID=CAXIPZ010000141.1,length=16023>
+##contig=<ID=CAXIPZ010000142.1,length=24937>
+##contig=<ID=CAXIPZ010000143.1,length=1000>
+##contig=<ID=CAXIPZ010000144.1,length=21002>
+##contig=<ID=CAXIPZ010000145.1,length=22959>
+##contig=<ID=CAXIPZ010000146.1,length=28890>
+##contig=<ID=CAXIPZ010000147.1,length=23789>
+##contig=<ID=CAXIPZ010000148.1,length=29872>
+##contig=<ID=CAXIPZ010000149.1,length=17493>
+##contig=<ID=CAXIPZ010000150.1,length=19437>
+##contig=<ID=CAXIPZ010000151.1,length=35734>
+##contig=<ID=CAXIPZ010000152.1,length=16630>
+##contig=<ID=CAXIPZ010000153.1,length=16962>
+##contig=<ID=CAXIPZ010000154.1,length=17547>
+##contig=<ID=CAXIPZ010000155.1,length=29140>
+##contig=<ID=CAXIPZ010000156.1,length=20825>
+##contig=<ID=CAXIPZ010000157.1,length=13363>
+##contig=<ID=CAXIPZ010000158.1,length=13608>
+##contig=<ID=CAXIPZ010000159.1,length=20076>
+##contig=<ID=CAXIPZ010000160.1,length=20029>
+##contig=<ID=CAXIPZ010000161.1,length=25148>
+##contig=<ID=CAXIPZ010000162.1,length=14103>
+##contig=<ID=CAXIPZ010000163.1,length=16500>
+##contig=<ID=CAXIPZ010000164.1,length=15647>
+##contig=<ID=CAXIPZ010000165.1,length=18063>
+##contig=<ID=CAXIPZ010000166.1,length=18951>
+##contig=<ID=CAXIPZ010000167.1,length=18300>
+##contig=<ID=CAXIPZ010000168.1,length=15749>
+##contig=<ID=CAXIPZ010000169.1,length=28464>
+##contig=<ID=CAXIPZ010000170.1,length=20000>
+##contig=<ID=CAXIPZ010000171.1,length=1000>
+##contig=<ID=CAXIPZ010000172.1,length=16303>
+##contig=<ID=CAXIPZ010000173.1,length=26652>
+##contig=<ID=CAXIPZ010000174.1,length=20291>
+##contig=<ID=CAXIPZ010000175.1,length=15365>
+##contig=<ID=CAXIPZ010000176.1,length=18467>
+##contig=<ID=CAXIPZ010000177.1,length=16076>
+##contig=<ID=CAXIPZ010000178.1,length=30404>
+##contig=<ID=CAXIPZ010000179.1,length=19328>
+##contig=<ID=CAXIPZ010000180.1,length=25155>
+##contig=<ID=CAXIPZ010000181.1,length=16282>
+##contig=<ID=CAXIPZ010000182.1,length=19444>
+##contig=<ID=CAXIPZ010000183.1,length=18626>
+##contig=<ID=CAXIPZ010000184.1,length=25876>
+##contig=<ID=CAXIPZ010000185.1,length=23797>
+##contig=<ID=CAXIPZ010000186.1,length=23129>
+##contig=<ID=CAXIPZ010000187.1,length=16789>
+##contig=<ID=CAXIPZ010000188.1,length=17159>
+##contig=<ID=CAXIPZ010000189.1,length=17815>
+##contig=<ID=CAXIPZ010000190.1,length=19197>
+##contig=<ID=CAXIPZ010000191.1,length=16751>
+##contig=<ID=CAXIPZ010000192.1,length=14257>
+##contig=<ID=CAXIPZ010000193.1,length=19019>
+##contig=<ID=CAXIPZ010000194.1,length=21619>
+##contig=<ID=CAXIPZ010000195.1,length=24767>
+##contig=<ID=CAXIPZ010000196.1,length=25776>
+##contig=<ID=CAXIPZ010000197.1,length=14117>
+##contig=<ID=CAXIPZ010000198.1,length=23683>
+##contig=<ID=CAXIPZ010000199.1,length=3000>
+##contig=<ID=CAXIPZ010000200.1,length=14707>
+##contig=<ID=CAXIPZ010000201.1,length=16171>
+##contig=<ID=CAXIPZ010000202.1,length=30889>
+##contig=<ID=CAXIPZ010000203.1,length=15465>
+##contig=<ID=CAXIPZ010000204.1,length=19521>
+##contig=<ID=CAXIPZ010000205.1,length=16929>
+##contig=<ID=CAXIPZ010000206.1,length=17635>
+##contig=<ID=CAXIPZ010000207.1,length=21350>
+##contig=<ID=CAXIPZ010000208.1,length=19725>
+##contig=<ID=CAXIPZ010000209.1,length=17469>
+##contig=<ID=CAXIPZ010000210.1,length=15530>
+##contig=<ID=CAXIPZ010000211.1,length=26211>
+##contig=<ID=CAXIPZ010000212.1,length=16252>
+##contig=<ID=CAXIPZ010000213.1,length=17972>
+##contig=<ID=CAXIPZ010000214.1,length=25404>
+##contig=<ID=CAXIPZ010000215.1,length=16265>
+##contig=<ID=CAXIPZ010000216.1,length=19506>
+##contig=<ID=CAXIPZ010000217.1,length=28747>
+##contig=<ID=CAXIPZ010000218.1,length=17979>
+##contig=<ID=CAXIPZ010000219.1,length=22519>
+##contig=<ID=CAXIPZ010000220.1,length=16508>
+##contig=<ID=CAXIPZ010000221.1,length=1000>
+##contig=<ID=CAXIPZ010000222.1,length=20605>
+##contig=<ID=CAXIPZ010000223.1,length=43845>
+##contig=<ID=CAXIPZ010000224.1,length=20520>
+##contig=<ID=CAXIPZ010000225.1,length=4000>
+##contig=<ID=CAXIPZ010000226.1,length=29525>
+##contig=<ID=CAXIPZ010000227.1,length=18719>
+##contig=<ID=CAXIPZ010000228.1,length=23540>
+##contig=<ID=CAXIPZ010000229.1,length=22131>
+##contig=<ID=CAXIPZ010000230.1,length=21202>
+##contig=<ID=CAXIPZ010000231.1,length=15925>
+##contig=<ID=CAXIPZ010000232.1,length=10090>
+##contig=<ID=CAXIPZ010000233.1,length=22872>
+##contig=<ID=CAXIPZ010000234.1,length=13882>
+##contig=<ID=CAXIPZ010000235.1,length=29532>
+##contig=<ID=CAXIPZ010000236.1,length=12059>
+##contig=<ID=CAXIPZ010000237.1,length=15986>
+##contig=<ID=CAXIPZ010000238.1,length=19213>
+##contig=<ID=CAXIPZ010000239.1,length=1000>
+##contig=<ID=CAXIPZ010000240.1,length=15760>
+##contig=<ID=CAXIPZ010000241.1,length=17392>
+##contig=<ID=CAXIPZ010000242.1,length=16922>
+##contig=<ID=CAXIPZ010000243.1,length=27403>
+##contig=<ID=CAXIPZ010000244.1,length=23856>
+##contig=<ID=CAXIPZ010000245.1,length=19852>
+##contig=<ID=CAXIPZ010000246.1,length=15818>
+##contig=<ID=CAXIPZ010000247.1,length=16912>
+##contig=<ID=CAXIPZ010000248.1,length=21891>
+##contig=<ID=CAXIPZ010000249.1,length=24305>
+##contig=<ID=CAXIPZ010000250.1,length=19906>
+##contig=<ID=CAXIPZ010000251.1,length=20458>
+##contig=<ID=CAXIPZ010000252.1,length=27258>
+##contig=<ID=CAXIPZ010000253.1,length=27413>
+##contig=<ID=CAXIPZ010000254.1,length=1000>
+##contig=<ID=CAXIPZ010000255.1,length=43334>
+##contig=<ID=CAXIPZ010000256.1,length=18616>
+##contig=<ID=CAXIPZ010000257.1,length=15095>
+##contig=<ID=CAXIPZ010000258.1,length=13346>
+##contig=<ID=CAXIPZ010000259.1,length=15617>
+##contig=<ID=CAXIPZ010000260.1,length=21194>
+##contig=<ID=CAXIPZ010000261.1,length=16059>
+##contig=<ID=CAXIPZ010000262.1,length=19372>
+##contig=<ID=CAXIPZ010000263.1,length=18132>
+##contig=<ID=CAXIPZ010000264.1,length=15336>
+##contig=<ID=CAXIPZ010000265.1,length=13219>
+##contig=<ID=CAXIPZ010000266.1,length=1000>
+##contig=<ID=CAXIPZ010000267.1,length=18996>
+##contig=<ID=CAXIPZ010000268.1,length=15400>
+##contig=<ID=CAXIPZ010000269.1,length=37578>
+##contig=<ID=CAXIPZ010000270.1,length=19304>
+##contig=<ID=CAXIPZ010000271.1,length=20516>
+##contig=<ID=CAXIPZ010000272.1,length=8595>
+##contig=<ID=CAXIPZ010000273.1,length=22127>
+##contig=<ID=CAXIPZ010000274.1,length=18658>
+##contig=<ID=CAXIPZ010000275.1,length=14638>
+##contig=<ID=CAXIPZ010000276.1,length=19700>
+##contig=<ID=CAXIPZ010000277.1,length=20390>
+##contig=<ID=CAXIPZ010000278.1,length=18416>
+##contig=<ID=CAXIPZ010000279.1,length=16701>
+##contig=<ID=CAXIPZ010000280.1,length=15454>
+##contig=<ID=CAXIPZ010000281.1,length=21862>
+##contig=<ID=CAXIPZ010000282.1,length=25281>
+##contig=<ID=CAXIPZ010000283.1,length=2000>
+##contig=<ID=CAXIPZ010000284.1,length=15986>
+##contig=<ID=CAXIPZ010000285.1,length=14193>
+##contig=<ID=CAXIPZ010000286.1,length=26944>
+##contig=<ID=CAXIPZ010000287.1,length=13246>
+##contig=<ID=CAXIPZ010000288.1,length=16738>
+##contig=<ID=CAXIPZ010000289.1,length=14228>
+##contig=<ID=CAXIPZ010000290.1,length=19741>
+##contig=<ID=CAXIPZ010000291.1,length=22831>
+##contig=<ID=CAXIPZ010000292.1,length=12728>
+##contig=<ID=CAXIPZ010000293.1,length=14973>
+##contig=<ID=CAXIPZ010000294.1,length=19549>
+##contig=<ID=CAXIPZ010000295.1,length=12790>
+##contig=<ID=CAXIPZ010000296.1,length=26497>
+##contig=<ID=CAXIPZ010000297.1,length=14986>
+##contig=<ID=CAXIPZ010000298.1,length=19982>
+##contig=<ID=CAXIPZ010000299.1,length=25645>
+##contig=<ID=CAXIPZ010000300.1,length=14429>
+##contig=<ID=CAXIPZ010000301.1,length=19837>
+##contig=<ID=CAXIPZ010000302.1,length=4000>
+##contig=<ID=CAXIPZ010000303.1,length=16393>
+##contig=<ID=CAXIPZ010000304.1,length=18020>
+##contig=<ID=CAXIPZ010000305.1,length=42391>
+##contig=<ID=CAXIPZ010000306.1,length=39732>
+##contig=<ID=CAXIPZ010000307.1,length=16069>
+##contig=<ID=CAXIPZ010000308.1,length=16211>
+##contig=<ID=CAXIPZ010000309.1,length=24796>
+##contig=<ID=CAXIPZ010000310.1,length=20994>
+##contig=<ID=CAXIPZ010000311.1,length=19459>
+##contig=<ID=CAXIPZ010000312.1,length=27611>
+##contig=<ID=CAXIPZ010000313.1,length=19610>
+##contig=<ID=CAXIPZ010000314.1,length=24683>
+##contig=<ID=CAXIPZ010000315.1,length=25417>
+##contig=<ID=CAXIPZ010000316.1,length=30064>
+##contig=<ID=CAXIPZ010000317.1,length=19921>
+##contig=<ID=CAXIPZ010000318.1,length=17439>
+##contig=<ID=CAXIPZ010000319.1,length=39577>
+##contig=<ID=CAXIPZ010000320.1,length=16932>
+##contig=<ID=CAXIPZ010000321.1,length=42951>
+##contig=<ID=CAXIPZ010000322.1,length=16639>
+##contig=<ID=CAXIPZ010000323.1,length=20246>
+##contig=<ID=CAXIPZ010000324.1,length=24194>
+##contig=<ID=CAXIPZ010000325.1,length=11234>
+##contig=<ID=CAXIPZ010000326.1,length=15982>
+##contig=<ID=CAXIPZ010000327.1,length=15878>
+##contig=<ID=CAXIPZ010000328.1,length=16397>
+##contig=<ID=CAXIPZ010000329.1,length=26167>
+##contig=<ID=CAXIPZ010000330.1,length=13788>
+##contig=<ID=CAXIPZ010000331.1,length=23859>
+##contig=<ID=CAXIPZ010000332.1,length=18758>
+##contig=<ID=CAXIPZ010000333.1,length=32447>
+##contig=<ID=CAXIPZ010000334.1,length=19553>
+##contig=<ID=CAXIPZ010000335.1,length=18284>
+##contig=<ID=CAXIPZ010000336.1,length=14254>
+##contig=<ID=CAXIPZ010000337.1,length=30720>
+##contig=<ID=OZ034935.1,length=18246>
+##ALT=<ID=*,Description="Represents allele(s) other than observed.">
+##INFO=<ID=INDEL,Number=0,Type=Flag,Description="Indicates that the variant is an INDEL.">
+##INFO=<ID=IDV,Number=1,Type=Integer,Description="Maximum number of raw reads supporting an indel">
+##INFO=<ID=IMF,Number=1,Type=Float,Description="Maximum fraction of raw reads supporting an indel">
+##INFO=<ID=DP,Number=1,Type=Integer,Description="Raw read depth">
+##INFO=<ID=VDB,Number=1,Type=Float,Description="Variant Distance Bias for filtering splice-site artefacts in RNA-seq data (bigger is better)",Version="3">
+##INFO=<ID=RPBZ,Number=1,Type=Float,Description="Mann-Whitney U-z test of Read Position Bias (closer to 0 is better)">
+##INFO=<ID=MQBZ,Number=1,Type=Float,Description="Mann-Whitney U-z test of Mapping Quality Bias (closer to 0 is better)">
+##INFO=<ID=BQBZ,Number=1,Type=Float,Description="Mann-Whitney U-z test of Base Quality Bias (closer to 0 is better)">
+##INFO=<ID=MQSBZ,Number=1,Type=Float,Description="Mann-Whitney U-z test of Mapping Quality vs Strand Bias (closer to 0 is better)">
+##INFO=<ID=SCBZ,Number=1,Type=Float,Description="Mann-Whitney U-z test of Soft-Clip Length Bias (closer to 0 is better)">
+##INFO=<ID=SGB,Number=1,Type=Float,Description="Segregation based metric, http://samtools.github.io/bcftools/rd-SegBias.pdf">
+##INFO=<ID=MQ0F,Number=1,Type=Float,Description="Fraction of MQ0 reads (smaller is better)">
+##FORMAT=<ID=PL,Number=G,Type=Integer,Description="List of Phred-scaled genotype likelihoods">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Number of high-quality bases">
+##FORMAT=<ID=SP,Number=1,Type=Integer,Description="Phred-scaled strand bias P-value">
+##FORMAT=<ID=AD,Number=R,Type=Integer,Description="Allelic depths (high-quality bases)">
+##FORMAT=<ID=ADF,Number=R,Type=Integer,Description="Allelic depths on the forward strand (high-quality bases)">
+##FORMAT=<ID=ADR,Number=R,Type=Integer,Description="Allelic depths on the reverse strand (high-quality bases)">
+##INFO=<ID=AD,Number=R,Type=Integer,Description="Total allelic depths (high-quality bases)">
+##INFO=<ID=ADF,Number=R,Type=Integer,Description="Total allelic depths on the forward strand (high-quality bases)">
+##INFO=<ID=ADR,Number=R,Type=Integer,Description="Total allelic depths on the reverse strand (high-quality bases)">
+##FORMAT=<ID=GQ,Number=1,Type=Integer,Description="Phred-scaled Genotype Quality">
+##INFO=<ID=AC,Number=A,Type=Integer,Description="Allele count in genotypes for each ALT allele, in the same order as listed">
+##INFO=<ID=AN,Number=1,Type=Integer,Description="Total number of alleles in called genotypes">
+##INFO=<ID=DP4,Number=4,Type=Integer,Description="Number of high-quality ref-forward , ref-reverse, alt-forward and alt-reverse bases">
+##INFO=<ID=MQ,Number=1,Type=Integer,Description="Average mapping quality">
+##bcftools_callVersion=1.21+htslib-1.21
+##bcftools_callCommand=call -m -Oz -f GQ,GP -W=tbi -o ../vcfSanger/21073D-02-01_S97_L002.vcf.gz; Date=Mon Mar 24 10:34:28 2025
+##bcftools_mergeVersion=1.21+htslib-1.21
+##bcftools_mergeCommand=merge -r OZ034921.1 -l vcf_list -m both -i IDV:sum,DP:sum,DP4:sum,AD:sum,MQ:avg -W=tbi -o OZ034921.1_ApalHap.allLoci.vcf.gz; Date=Mon Mar 24 12:17:11 2025
+##bcftools_normVersion=1.21+htslib-1.21
+##bcftools_normCommand=norm -f /project/ckenkel_26/RefSeqs/ApalGenome/ApalmGenome_vSanger/GCA_964030605.1/GCA_964030605.1_jaAcrPala1.1_genomic.fna -c ws -Ou OZ034921.1_ApalHap.allLoci.vcf.gz; Date=Wed Apr  2 10:16:15 2025
+##bcftools_viewVersion=1.21+htslib-1.21
+##bcftools_viewCommand=view -m 2 -M 2 -Oz -o OZ034921.1_ApalHap.refcorrected.vcf.gz; Date=Wed Apr  2 10:16:15 2025
+##bcftools_annotateVersion=1.21+htslib-1.21
+##bcftools_annotateCommand=annotate --set-id %CHROM\_%POS\_%REF\_%ALT -Oz -o OZ034921.1_ApalHap.SNPid.vcf.gz OZ034921.1_ApalHap.refcorrected.vcf.gz; Date=Wed Apr 16 17:22:47 2025
+##bcftools_viewCommand=view -S SamplesKINGuniq.txt -W=tbi -o OZ034921.1_ApalHap.KINGuniqSamp.vcf.gz OZ034921.1_ApalHap.SNPid.vcf.gz; Date=Thu May 29 09:40:20 2025
+##bcftools_mergeCommand=merge -m both -i IDV:sum,DP:sum,DP4:sum,AD:sum,MQ:avg -W=tbi -Oz -o OZ034921.1_AllCHR_ExptIMPfilt_plus66_Merge.vcf.gz OZ034921.1_GL_allLoci_realign_IGP099_IMP_DR2099.vcf.gz /scratch1/ckenkel/ApalWGS/Haplotype/vcfSanger/OZ034921.1_ApalHap.KINGuniqSamp.vcf.gz; Date=Thu May 29 09:42:22 2025
+##bcftools_viewCommand=view -e 'INFO/AC<3 | (INFO/AN-INFO/AC)<3' -Ou OZ034921.1_AllCHR_ExptIMPfilt_plus66_Merge.vcf.gz; Date=Thu May 29 09:47:10 2025
+##bcftools_normCommand=norm -f /project/ckenkel_26/RefSeqs/ApalGenome/ApalmGenome_vSanger/GCA_964030605.1/GCA_964030605.1_jaAcrPala1.1_genomic.fna -c ws -Ou; Date=Thu May 29 09:47:10 2025
+##bcftools_viewCommand=view -m 2 -M 2 -W=tbi -Oz -o OZ034921.1_AllCHR_ExptIMPfilt_plus66_Merge_Filt.vcf.gz; Date=Thu May 29 09:47:10 2025
+##bcftools_concatVersion=1.21+htslib-1.21
+##bcftools_concatCommand=concat -f cat_list3 -W=tbi -Oz -o AllCHR_ExptIMPfilt_plus66_Merge_Filt.vcf.gz; Date=Thu May 29 09:57:32 2025
+##bcftools_viewCommand=view -i ID=@snp_list.txt AllCHR_ExptIMPfilt_plus66_Merge_Filt.vcf.gz; Date=Fri Jun 20 12:06:24 2025
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	21073D-03-01_S46_L003	21073D-03-02_S75_L005	21073D-03-03_S76_L005	21073D-03-04_S77_L005	21073D-03-05_S47_L003	21073D-03-06_S78_L005	21073D-03-07_S48_L003	21073D-03-08_S79_L005	21073D-03-100_S118_L003	21073D-03-101_S99_L005	21073D-03-102_S100_L005	21073D-03-103_S101_L005	21073D-03-104_S102_L005	21073D-03-105_S119_L003	21073D-03-106_S120_L003	21073D-03-107_S121_L003	21073D-03-108_S122_L003	21073D-03-109_S123_L003	21073D-03-10_S49_L003	21073D-03-110_S124_L003	21073D-03-111_S125_L003	21073D-03-112_S126_L003	21073D-03-113_S127_L003	21073D-03-114_S128_L003	21073D-03-115_S129_L003	21073D-03-116_S130_L003	21073D-03-117_S131_L003	21073D-03-118_S132_L003	21073D-03-119_S133_L003	21073D-03-11_S50_L003	21073D-03-120_S134_L003	21073D-03-121_S135_L003	21073D-03-122_S136_L003	21073D-03-123_S137_L003	21073D-03-124_S138_L003	21073D-03-125_S139_L003	21073D-03-126_S140_L003	21073D-03-127_S141_L003	21073D-03-128_S142_L003	21073D-03-129_S143_L003	21073D-03-12_S80_L005	21073D-03-130_S144_L003	21073D-03-131_S145_L003	21073D-03-132_S146_L003	21073D-03-133_S147_L003	21073D-03-134_S148_L003	21073D-03-135_S149_L003	21073D-03-136_S150_L003	21073D-03-137_S151_L003	21073D-03-138_S152_L003	21073D-03-139_S153_L003	21073D-03-140_S103_L005	21073D-03-141_S104_L005	21073D-03-142_S154_L003	21073D-03-143_S105_L005	21073D-03-144_S155_L003	21073D-03-145_S106_L005	21073D-03-146_S107_L005	21073D-03-147_S156_L003	21073D-03-148_S108_L005	21073D-03-149_S109_L005	21073D-03-14_S51_L003	21073D-03-150_S110_L005	21073D-03-152_S111_L005	21073D-03-153_S129_L006	21073D-03-154_S157_L003	21073D-03-155_S158_L003	21073D-03-156_S159_L003	21073D-03-157_S160_L003	21073D-03-15_S52_L003	21073D-03-16_S53_L003	21073D-03-17_S85_L005	21073D-03-18_S54_L003	21073D-03-19_S86_L005	21073D-03-20_S55_L003	21073D-03-21_S81_L005	21073D-03-23_S56_L003	21073D-03-24_S57_L003	21073D-03-25_S58_L003	21073D-03-26_S59_L003	21073D-03-27_S60_L003	21073D-03-28_S61_L003	21073D-03-30_S63_L003	21073D-03-31_S64_L003	21073D-03-32_S82_L005	21073D-03-33_S65_L003	21073D-03-34_S66_L003	21073D-03-35_S67_L003	21073D-03-36_S68_L003	21073D-03-37_S69_L003	21073D-03-38_S70_L003	21073D-03-39_S71_L003	21073D-03-40_S72_L003	21073D-03-41_S73_L003	21073D-03-42_S74_L003	21073D-03-43_S75_L003	21073D-03-44_S76_L003	21073D-03-45_S77_L003	21073D-03-46_S78_L003	21073D-03-47_S79_L003	21073D-03-49_S80_L003	21073D-03-51_S81_L003	21073D-03-52_S82_L003	21073D-03-53_S83_L003	21073D-03-54_S84_L003	21073D-03-55_S85_L003	21073D-03-56_S86_L003	21073D-03-57_S87_L003	21073D-03-58_S90_L005	21073D-03-59_S88_L003	21073D-03-60_S89_L003	21073D-03-61_S90_L003	21073D-03-62_S91_L003	21073D-03-63_S92_L003	21073D-03-64_S93_L003	21073D-03-65_S94_L003	21073D-03-66_S91_L005	21073D-03-67_S95_L003	21073D-03-68_S96_L003	21073D-03-69_S97_L003	21073D-03-70_S98_L003	21073D-03-71_S99_L003	21073D-03-72_S100_L003	21073D-03-73_S101_L003	21073D-03-74_S102_L003	21073D-03-75_S103_L003	21073D-03-76_S104_L003	21073D-03-77_S105_L003	21073D-03-78_S106_L003	21073D-03-79_S92_L005	21073D-03-80_S107_L003	21073D-03-81_S108_L003	21073D-03-82_S93_L005	21073D-03-83_S94_L005	21073D-03-84_S109_L003	21073D-03-85_S110_L003	21073D-03-86_S111_L003	21073D-03-87_S95_L005	21073D-03-88_S112_L003	21073D-03-89_S113_L003	21073D-03-90_S96_L005	21073D-03-91_S97_L005	21073D-03-92_S98_L005	21073D-03-93_S114_L003	21073D-03-94_S115_L003	21073D-03-95_S116_L003	21073D-03-96_S117_L003	21073D-03-97_S161_L003	21073D-03-98_S162_L003	21073D-03-99_S163_L003	21073D-02-29_S165_L003
+OZ034921.1	20692798	OZ034921.1_20692798_A_G	A	G	284.59	PASS	VDB=0.438798;SGB=-0.689466;RPBZ=0.463912;MQBZ=0.755929;MQSBZ=0.912871;BQBZ=0.418787;SCBZ=0;MQ0F=0;AD=371,242;DP=675;DP4=190,181,136,106;MQ=58;DR2=1;AF=0.54;ADF=14,4;ADR=12,7;AN=302;AC=163	GT:DS:GP:PL:DP:SP:ADF:ADR:AD:GQ	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0/1:.:5.40348e-22,1,1.46308e-10:206,0,99:13:3:2,7:2,2:4,9:98
+OZ034923.1	5270789	OZ034923.1_5270789_T_G	T	G	284.59	PASS	MQ0F=0;VDB=0.264276;SGB=-0.692914;RPBZ=-1.40096;MQBZ=0;MQSBZ=0;BQBZ=3.00463;SCBZ=0;AD=546,236;DP=891;DP4=263,283,115,121;MQ=60;DR2=1;AF=0.2767;ADF=8,4;ADR=9,4;AN=302;AC=83	GT:DS:GP:DP:SP:ADF:ADR:AD:PL:GQ	0|0:0:1,0,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0/0:.:.:26:0:10,.:16,.:26,.:.:.
+OZ034924.1	8657809	OZ034924.1_8657809_A_T	A	T	284.59	PASS	MQ0F=0;VDB=0.276208;SGB=-0.691153;RPBZ=0.424842;MQBZ=-0.113304;MQSBZ=0.267364;BQBZ=-1.05409;SCBZ=0;AD=503,189;DP=773;DP4=242,261,96,93;MQ=59;DR2=1;AF=0.2633;ADF=3,7;ADR=2,4;AN=302;AC=80	GT:DS:GP:DP:SP:ADF:ADR:AD:PL:GQ	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0/1:.:1.28121e-26,1,1.23117e-24:20:0:4,4:6,6:10,10:255,0,237:127
+OZ034924.1	13288405	OZ034924.1_13288405_C_T	C	T	284.59	PASS	VDB=0.316575;SGB=-0.651104;RPBZ=-1.78287;MQBZ=-2.84927;MQSBZ=1.19177;BQBZ=-0.549284;SCBZ=0;MQ0F=0;AD=687,25;DP=783;DP4=332,355,50,1;MQ=42;DR2=1;AF=0.18;ADF=8,3;ADR=6,0;AN=302;AC=54	GT:DS:GP:DP:SP:ADF:ADR:AD:PL:GQ	1|1:2:0,0,1:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0/0:.:.:21:0:15,.:6,.:21,.:.:.
+OZ034924.1	19139343	OZ034924.1_19139343_C_T	C	T	284.59	PASS	MQ0F=0;VDB=0.671308;SGB=-0.683931;RPBZ=-0.296508;MQBZ=-1.90854;MQSBZ=1.60422;BQBZ=0.446641;SCBZ=1.90854;AD=398,277;DP=756;DP4=220,178,153,125;MQ=59;DR2=1;AF=0.5033;ADF=8,8;ADR=5,1;AN=302;AC=151	GT:DS:GP:DP:SP:ADF:ADR:AD:PL:GQ	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0/0:.:.:21:0:14,.:7,.:21,.:.:.
+OZ034924.1	20154249	OZ034924.1_20154249_C_T	C	T	284.59	PASS	MQ0F=0;VDB=0.950344;SGB=-0.690438;RPBZ=-0.819598;MQBZ=0;MQSBZ=0;BQBZ=0.252079;SCBZ=0;AD=646,105;DP=856;DP4=320,326,59,47;MQ=60;DR2=1;AF=0.09;ADF=17,6;ADR=7,2;AN=302;AC=27	GT:DS:GP:DP:SP:ADF:ADR:AD:PL:GQ	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0/0:.:.:13:0:6,.:7,.:13,.:.:.
+OZ034924.1	21695075	OZ034924.1_21695075_T_C	T	C	284.59	PASS	MQ0F=0;VDB=0.729128;SGB=-0.670168;RPBZ=0;MQBZ=0;MQSBZ=0;BQBZ=-0.894427;SCBZ=0;AD=338,37;DP=387;DP4=234,104,23,15;MQ=40;DR2=1;AF=0.0733;ADF=10,4;ADR=3,1;AN=302;AC=22	GT:DS:GP:DP:SP:ADF:ADR:AD:PL:GQ	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0/0:.:.:5:0:5,.:0,.:5,.:.:.
+OZ034925.1	468027	OZ034925.1_468027_T_C	T	C	284.59	PASS	VDB=0.929982;SGB=-0.693147;MQSBZ=0;MQ0F=0;RPBZ=-0.673575;MQBZ=0;BQBZ=0.942809;SCBZ=-0.942809;AD=141,498;DP=730;DP4=68,73,214,284;MQ=60;DR2=1;AF=0.8767;ADF=3,2;ADR=5,4;AN=302;AC=265	GT:DS:GP:PL:DP:SP:ADF:ADR:AD:GQ	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1/1:.:0,0,1:255,36,0:12:0:0,6:0,6:0,12:127
+OZ034925.1	15139321	OZ034925.1_15139321_G_T	G	T	284.59	PASS	VDB=0.235174;SGB=-0.69312;MQSBZ=0;MQ0F=0;RPBZ=-0.798367;MQBZ=0;BQBZ=-0.745356;SCBZ=0;AD=152,499;DP=749;DP4=77,75,236,264;MQ=60;DR2=1;AF=0.93;ADF=7,2;ADR=7,6;AN=302;AC=281	GT:DS:GP:PL:DP:SP:ADF:ADR:AD:GQ	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1/1:.:0,0,1:255,39,0:13:0:0,9:0,4:0,13:127
+OZ034927.1	778568	OZ034927.1_778568_A_G	A	G	284.59	PASS	MQ0F=0;VDB=0.620316;SGB=-0.692562;RPBZ=-0.911385;MQBZ=0;MQSBZ=0;BQBZ=-0.992224;SCBZ=0.904534;AD=344,248;DP=678;DP4=176,168,132,116;MQ=60;DR2=1;AF=0.1833;ADF=4,3;ADR=4,3;AN=302;AC=55	GT:DS:GP:DP:SP:ADF:ADR:AD:PL:GQ	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0/0:.:.:15:0:10,.:5,.:15,.:.:.
+OZ034928.1	10054549	OZ034928.1_10054549_A_G	A	G	284.59	PASS	VDB=0.0181828;SGB=-0.689466;RPBZ=-2.14021;MQBZ=0;MQSBZ=0;BQBZ=0.238768;SCBZ=0;MQ0F=0;AD=553,208;DP=866;DP4=281,272,99,111;MQ=60;DR2=1;AF=0.3967;ADF=10,1;ADR=15,1;AN=302;AC=120	GT:DS:GP:PL:DP:SP:ADF:ADR:AD:GQ	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0/1:.:3.84107e-26,1,6.50861e-25:251,0,239:16:2:5,3:3,5:8,8:127
+OZ034928.1	15596629	OZ034928.1_15596629_A_C	A	C	284.59	PASS	VDB=0.999574;SGB=-0.651104;RPBZ=-0.922101;MQBZ=-3.96796;MQSBZ=-0.267834;BQBZ=0;SCBZ=0;MQ0F=0;AD=792,52;DP=907;DP4=452,340,37,35;MQ=43;DR2=1;AF=0.0667;ADF=4,0;ADR=0,1;AN=302;AC=20	GT:DS:GP:PL:DP:SP:ADF:ADR:AD:GQ	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0/0:.:.:.:28:0:15,.:13,.:28,.:.
+OZ034934.1	2468289	OZ034934.1_2468289_T_A	T	A	228.293	PASS	VDB=0.150123;SGB=-0.692562;MQSBZ=0.331662;MQ0F=0;RPBZ=-0.656642;MQBZ=0;BQBZ=0.119195;SCBZ=0;AD=98,544;DP=736;DP4=47,51,264,280;MQ=57;DR2=1;AF=0.9233;ADF=5,5;ADR=9,2;AN=302;AC=279	GT:DS:GP:PL:DP:SP:ADF:ADR:AD:GQ	1|1:2:0,0,1:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1/1:.:0,0,1:255,60,0:20:0:0,7:0,13:0,20:127
+OZ034934.1	8778027	OZ034934.1_8778027_G_T	G	T	284.59	PASS	MQ0F=0;VDB=0.0574444;SGB=-0.676189;RPBZ=0.572181;MQBZ=-3.75726;MQSBZ=-0.106405;BQBZ=-0.891222;SCBZ=0.615728;AD=727,6;DP=850;DP4=365,362,10,17;MQ=59;DR2=1;AF=0.07;ADF=12,2;ADR=10,4;AN=302;AC=21	GT:DS:GP:DP:SP:ADF:ADR:AD:PL:GQ	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|1:2:0,0,1:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|1:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	1|0:1:0,1,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0|0:0:1,0,0:.:.:.:.:.:.:.	0/0:.:.:14:0:10,.:4,.:14,.:.:.

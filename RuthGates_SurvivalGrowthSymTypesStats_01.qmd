@@ -1,0 +1,981 @@
+---
+title: "Ruth Gates Analysis and Figures Part 1: Stats"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Load all of the needed libraries.
+
+```{r}
+library(devtools)
+
+#install.packages("glmmTMB",type='source') #will need to install development tools and gfortran
+#install.packages("wesanderson")
+#install.packages("lme4", type = "source")
+#install.packages("vcfR")
+
+# Graphical tools :
+library(ggplot2)
+library(cowplot)
+library(gridExtra)
+#library(nationalparkcolors)
+
+# Data Wrangling :
+library(dplyr)
+library(tidyr)
+library(forcats)
+library(car)
+library(vcfR)
+
+# Stats Packages :
+library(lme4)
+library(lsmeans)
+library(lmerTest)
+library(MuMIn)
+library(Matrix)
+library(glmmTMB)
+library(bbmle)
+library(DHARMa) 
+## Learning DHARMa - https://cran.r-project.org/web/packages/DHARMa/vignettes/DHARMa.html
+library(multcomp)
+library(betareg)
+library(emmeans)
+library(multcompView)
+
+#pretty stats table function
+library(xtable)
+pxt <- function(x,title) {
+cat(sprintf("{\n\n\\textbf{%s}\n\\ \\\\\\vspace{2pt}\\ \\\\\n",title))
+13
+print(xtable(x), floating=FALSE); cat("\n\n")
+cat("\\ \\\\\\vspace{5pt}\\ \\\\\n")
+}
+
+# Survival analysis :
+library(survival) 
+library(coxme)
+library(survminer) #for plots
+library(wesanderson)
+
+```
+
+Load in the quality filtered trait data and integrated symbiont type dataset
+
+## Import the final QC-ed datafile for subsequent statistical analysis
+
+```{r}
+
+traitsFiltered_SymTypeSubset<-readRDS(file="~/Dropbox/CarlsLab/ResearchProjects/NOAA_RuthGates/TraitData/traitsFiltered_SymTypeSubset.rds")
+
+Nori<-traitsFiltered_SymTypeSubset %>%
+    group_by(Genet) %>%
+    count(Origin) 
+
+summary(Nori)
+
+```
+
+## Now for some Trait statistics
+
+Note, Racks are nested within tanks as random effects and genets are within families. To focus on cross effects Must create data subset with 3 high replication Batch Cross Origins to ask about diffs in variance among crosses
+
+```{r}
+
+traitsAllCrossSym <- traitsFiltered_SymTypeSubset %>%
+  filter(Origin=="E-B Batch Cross" | Origin=="LK3 x LK10 Biparental Cross" | Origin=="E-H-SI Batch Cross") %>%
+  droplevels()
+
+summary(traitsAllCrossSym)
+
+#create dummy variable for parsing of any interaction effects
+traitsAllCrossSym$OriTrt<-with(traitsAllCrossSym,factor(Origin:Treatment))
+
+
+```
+
+Exploratory plots suggest difference in symbiont type among families - will need to test for and account for this in subsequent trait models. Symbiont data are almost binary with many near 0 and near 1...need beta regression
+
+```{r}
+
+hist(traitsAllCrossSym$X.D,breaks=30) #not horrible actually but behave almost like a binomial
+hist(traitsAllCrossSym$X.A,breaks=30) #Is prop D is more informative bc more ones than zeros??
+hist(traitsAllCrossSym$X.C,breaks=30) #C is really non-informative and quite infrequent
+
+#create binary to distinguish zero from non-zero max growth for exploratory plots...prop A would be largely inverse but more zeros
+
+traitsAllCrossSym$D_nonzero<-ifelse((traitsAllCrossSym$X.D > 0 & !is.na(traitsAllCrossSym$X.D)), 1, 0)
+
+ggplot(traitsAllCrossSym, aes(Treatment, X.D, colour = as.factor(D_nonzero))) + geom_jitter() #small treatment effect
+
+ggplot(traitsAllCrossSym, aes(Origin, X.D, colour = as.factor(D_nonzero))) + geom_jitter() #very much origin effect
+
+ggplot(traitsAllCrossSym, aes(Treatment, X.D, colour = as.factor(D_nonzero))) + geom_jitter()+facet_wrap(~Origin) #not really interaction
+
+ggplot(traitsAllCrossSym, aes(Genet, X.D, colour = as.factor(D_nonzero))) + geom_jitter() #genet effect somewhat noisy...origin seems bigger driver
+
+ggplot(traitsAllCrossSym, aes(Raceway, X.D, colour = as.factor(D_nonzero))) + geom_jitter() #raceway effect not really noticeable
+
+#lets try fitting with plain beta regression - for values bounded between 0 and 1
+BR_d<-betareg(X.D ~ Origin+Treatment+Origin:Treatment,data=traitsAllCrossSym)
+summary(BR_d)
+AIC(BR_d)
+summary(BR_d)$pseudo.r.squared #really not a lot of variance explained
+joint_tests(BR_d) #mega effect of origin, minor treatment, none for interaction really
+plot(fitted(BR_d),
+     residuals(BR_d)) #ugly...why so many bins?
+plot(BR_d)
+
+marginal = emmeans(BR_d,
+                   ~ Origin)
+
+pairs(marginal,
+      adjust="tukey")
+
+
+Sum = cld(marginal,
+          alpha   = 0.05,
+          Letters = letters,         ###  Use lowercase letters for .group
+          adjust  = "tukey")         ###  Tukey-adjusted comparisons
+
+
+Sum
+
+
+traitsAllCrossSym$GenetOri<-with(traitsAllCrossSym,factor(Origin:Genet))
+traitsAllCrossSym$GenetOriR = relevel(traitsAllCrossSym$GenetOri, ref = "E-H-SI Batch Cross:2")
+
+#curious - what if we drop interaction to simplify model and add genet effect- better fit?
+BR_d2<-betareg(X.D ~ GenetOriR+Treatment,data=traitsAllCrossSym)
+summary(BR_d2)
+AIC(BR_d2)
+summary(BR_d2)$pseudo.r.squared #MUCH better fit
+
+plot(fitted(BR_d2),
+     residuals(BR_d2)) #better
+plot(BR_d2) #best model
+
+marginal2 = emmeans(BR_d2,
+                   ~ GenetOriR)
+
+tabD2<-emmeans(BR_d2,~ Treatment)
+tabD2
+summary(tabD2)[2,2]-summary(tabD2)[1,2] #take difference in means, heat - ctrl
+
+AIC(BR_d,BR_d2)
+
+#Number of EB genets = 80
+length(grep("GenetOriRE-B",rownames(summary(BR_d2)$coefficients$mean)))
+
+#how many significant? 25
+grep("GenetOriRE-B",names(which(summary(BR_d2)$coefficients$mean[,4]<0.05))) 
+
+
+#Number of LK genets = 42
+length(grep("GenetOriRLK3",rownames(summary(BR_d2)$coefficients$mean)))
+
+#how many significant? 1
+grep("GenetOriRLK3",names(which(summary(BR_d2)$coefficients$mean[,4]<0.05))) 
+
+
+#Number of EHSI genets = 25+1 for ref = 26
+length(grep("GenetOriRE-H",rownames(summary(BR_d2)$coefficients$mean)))
+
+#how many significant? 12
+grep("GenetOriRE-H",names(which(summary(BR_d2)$coefficients$mean[,4]<0.05))) 
+
+
+#NOW does proportion Symbiodinium mirror D results? it should
+BR_a<-betareg(X.A ~ Origin+Treatment+Origin:Treatment,data=traitsAllCrossSym)
+summary(BR_a)
+summary(BR_a)$pseudo.r.squared #same same
+joint_tests(BR_a) #mega effect of origin, minor treatment, none for interaction 
+
+plot(fitted(BR_a),
+     residuals(BR_a)) #ugly...why so many bins?
+plot(BR_a)
+
+marginal = emmeans(BR_a,
+                   ~ Origin)
+
+pairs(marginal,
+      adjust="tukey")
+
+
+Sum = cld(marginal,
+          alpha   = 0.05,
+          Letters = letters,         ###  Use lowercase letters for .group
+          adjust  = "tukey")         ###  Tukey-adjusted comparisons
+
+
+Sum
+
+## now with genet nested within origin
+BR_a2<-betareg(X.A ~ GenetOriR+Treatment,data=traitsAllCrossSym)
+summary(BR_a2)
+summary(BR_a2)$pseudo.r.squared #same same, much better
+
+plot(fitted(BR_a2),
+     residuals(BR_a2)) #better
+plot(BR_a2)
+
+tabA2<-emmeans(BR_a2,~ Treatment)
+tabA2
+summary(tabA2)[2,2]-summary(tabA2)[1,2] #take difference in means, heat - ctrl
+
+AIC(BR_a,BR_a2) #again, includign genet makes better model
+
+
+
+#main conclusion here is that the Proportion of Durusdinium varies as a function of cross type and treatment, but not the interaction. Durusdinium based trade-offs can influence growth/survival - need to account for this when modeling effects of cross type and treatment on sym photophys, growth and survival
+
+```
+
+S:H Cell Ratio
+
+```{r}
+
+hist(traitsAllCrossSym$SH_T, breaks=30)
+summary(traitsAllCrossSym$SH_T) #more strongly skewed data...
+
+ggplot(traitsAllCrossSym, aes(Treatment, SH_T)) + geom_jitter() #mostly just some strong outliers
+
+ggplot(traitsAllCrossSym, aes(Origin, SH_T)) + geom_jitter() #same
+
+ggplot(traitsAllCrossSym, aes(Treatment, SH_T)) + geom_jitter()+facet_wrap(~Origin) #not really interaction
+
+ggplot(traitsAllCrossSym, aes(Genet, SH_T)) + geom_jitter() #genet effect somewhat noisy...origin seems bigger driver
+
+ggplot(traitsAllCrossSym, aes(Raceway, SH_T)) + geom_jitter() #raceway effect not really noticeable
+
+#what if we just log transform and run lmer
+hist(log10(traitsAllCrossSym$SH_T), breaks=30) #now looks nice...suspect will work
+
+#traitsCross_SAclean<-traitsCross[complete.cases(traitsCross$SA_dif_cor_log),]
+
+SH_T_model <- lmer(log10(traitsAllCrossSym$SH_T) ~ X.D+Origin*Treatment  + (1|Genet) + (1|Raceway), data=traitsAllCrossSym)
+
+qqPlot(residuals(SH_T_model),xlab="Theoretical Quantiles",ylab="Observed Quantiles") #looks very nice
+plot(SH_T_model,which=1) #feeling pretty good about this
+
+shRes <- simulateResiduals(fittedModel = SH_T_model)
+plot(shRes) #not terrible
+
+summary(SH_T_model) 
+
+anova(SH_T_model,ddf="Kenward-Roger") 
+
+traitsAllCrossSym %>% 
+  mutate(log_SHT=log10(SH_T)) %>%
+  ggplot(aes(x = Origin, y = log_SHT)) + 
+  geom_boxplot() #verify origin effect
+
+rand(SH_T_model) #genet non-sig, raceway very sig (possibly conflated with treatment)
+
+Ori <- glht(SH_T_model, linfct = mcp(Origin = "Tukey"))
+summary(Ori) 
+
+```
+
+Photophysiology
+
+```{r}
+
+############### Fv/Fm
+
+hist(traitsAllCrossSym$FvFm_PropDif, breaks=20) #looks great
+
+FvFm_model <- lmer(FvFm_PropDif ~ X.D+Origin*Treatment  + (1|Genet) + (1|Raceway), data=traitsAllCrossSym) #default is gaussian(identity)
+
+resFvFm <- simulateResiduals(fittedModel = FvFm_model)
+plot(resFvFm) #pretty okay
+
+
+summary(FvFm_model) #what if we decide this model is good enough...
+
+anova(FvFm_model,ddf="Kenward-Roger") #lots going on, effect of D and interaction
+
+emmeans(FvFm_model,~ Origin)
+
+
+rand(FvFm_model) #strong random effects as well, raceway bigger than genet
+
+#need to rerun with dummy interaction variable to get proper contrasts
+
+FvFm_model2 <- lmer(FvFm_PropDif ~ X.D+OriTrt  + (1|Genet) + (1|Raceway), data=traitsAllCrossSym) #default is gaussian(identity)
+
+emmeans(FvFm_model2,~ OriTrt)
+
+resFvFm2 <- simulateResiduals(fittedModel = FvFm_model2)
+plot(resFvFm2) #same
+
+OT <- glht(FvFm_model2, linfct = mcp(OriTrt = "Tukey"))
+summary(OT) 
+
+#EB batch shows treatment effect
+#also baseline diff in control conditions
+
+
+```
+
+## Survival Data
+
+```{r}
+
+names(traitsAllCrossSym)
+
+traitsAllCrossSym %>%
+    group_by(Origin, Treatment) %>%
+    summarise (propDead = mean(Mortality),meanTOD = mean(TOD)) #No mortality in control; only mortality in heat... variation among crosses?
+
+traitsAllCrossSym$Genet<-relevel(traitsAllCrossSym$Genet,ref="4") #relevel with best surviving genet as reference
+traitsAllCrossSym$Origin<-relevel(traitsAllCrossSym$Origin,ref="LK3 x LK10 Biparental Cross") #relevel with best surviving cross as reference
+
+summary(traitsAllCrossSym$TOD)
+
+heats<-traitsAllCrossSym %>%
+  filter(Treatment=="Heat") %>%
+  droplevels()
+
+ctrls<-traitsAllCrossSym %>%
+  filter(Treatment=="Control") %>%
+  droplevels()
+
+summary(heats$TOD)
+summary(ctrls$TOD) #coding error - different max survival time artifact - need to make identical - solved
+
+#survival by cross origin and treatment
+iter<-coxme.control(iter.max=500)
+
+died=Surv(traitsAllCrossSym$TOD, traitsAllCrossSym$Mortality)
+
+table(died) 
+
+survObT<-coxme(died~Origin*Treatment+(1|Raceway), data=traitsAllCrossSym,control=iter) #does not converge bc no variance for ctrls
+
+summary(survObT) #yes, cannot estimate p-value; therefore will run as simpler model first
+
+survT<-coxme(died~Treatment+(1|Raceway), data=traitsAllCrossSym,control=iter) #does not converge bc no variance for ctrls
+
+summary(survT)#yeah, blows up bc treatment coefficient is insane - will run subset - just heat-treated
+
+diedH=Surv(heats$TOD, heats$Mortality) 
+
+table(diedH) 
+
+survO<-coxme(diedH~Origin+(1|Raceway), data=heats,control=iter) #def origin effect
+
+survO
+
+summary(survO) #sig higher mortality risk in E-B and E-H-SI batch, but need to control for sym type
+
+###what if we now add in an effect of proportion Durusdinium? Might not be possible if deads don't have Durusdinium
+
+heats %>%
+  filter(Mortality>0.99)#there is data on sym type here...
+
+survOD<-coxme(diedH~Origin+X.D+(1|Raceway), data=heats,control=iter) #def origin effect
+
+survOD
+
+summary(survOD) #OOOOHHHHH Durusdinium reduces mortality risk, but still have Origin effect with E-H-SI being higher mortality risk than E-B and LK biparental
+
+heats$Origin<-relevel(heats$Origin,ref="E-B Batch Cross") #relevel to get pairwise origin difs
+
+survOD2<-coxme(diedH~Origin+X.D+(1|Raceway), data=heats,control=iter) #def origin effect
+
+summary(survOD2) #E-H-SI also sig worse than E-B
+
+#BUT need to think about potential interaction effects since Prop D differs by Origin - lets make artificial bins to try to calculate
+head(heats)
+
+hist(heats$X.D,breaks=30) #lots of D and A dominated, and transitional
+
+heats$D_bins<-cut(heats$X.D,
+                  breaks=c(0,0.1,0.9,1),
+                  labels=c('negligible','transitional','dominant')) #defining transitional as more than 10% and less than 90%
+
+heats$D_bins<-relevel(heats$D_bins,ref="dominant") #relevel to get pairwise
+
+survOCatD<-coxme(diedH~Origin*D_bins+(1|Raceway), data=heats,control=iter) #interaction model not successful
+
+survOCatD<-coxme(diedH~Origin+D_bins+(1|Raceway), data=heats,control=iter) #will do additive
+
+survOCatD
+
+summary(survOCatD) #E-H-SI sig higher mortality than LK biparental, and any amount of D helps; less than 10% D increases mortality risk by 3.8
+
+heats$D_bins<-relevel(heats$D_bins,ref="transitional") #relevel to get pairwise
+
+survOCatD2<-coxme(diedH~Origin+D_bins+(1|Raceway), data=heats,control=iter) #will do additive
+
+summary(survOCatD2) #E-H-SI sig higher mortality than LK biparental, and any amount of D helps; less than 10% 
+
+################### Kaplan-Meier survival curves
+wes_palette("AsteroidCity1")
+origin = c("LK3 x LK10 Biparental Cross", "E-B Batch Cross", "E-H-SI Batch Cross")
+colorO = c("cyan", "black", "gray20")
+
+surPlotO = survfit(diedH ~ Origin, data=heats)
+
+plot(surPlotO, col=colorO, lwd=3, xlab="Days", ylab="Fraction Surviving", main="Survival by Cross Origin")
+legend("bottomleft", col=colorO, legend=origin, lwd=3, bty="n")
+
+ggsurvplot(
+  surPlotO,
+  data = heats,
+  size = 1,                 # change line size
+  palette =
+    c("royalblue","mediumorchid3","coral"),# custom color palettes #wes_palette("AsteroidCity1")
+  conf.int = TRUE,          # Add confidence interval
+#  pval = TRUE,              # Add p-value
+  risk.table = TRUE,        # Add risk table
+  risk.table.col = "strata",# Risk table color by groups
+  legend.labs =
+    c("LK3 x LK10 Biparental Cross", "E-B Batch Cross", "E-H-SI Batch Cross"),    # Change legend labels
+  risk.table.height = 0.25, # Useful to change when you have multiple groups
+  ggtheme = theme_bw()      # Change ggplot2 theme
+)
+
+
+##okay - what about doing little bins to create artificial interaction to see Durusdinium effect in addition to Origin
+
+head(heats)
+
+hist(heats$X.D,breaks=30) #lots of D and A dominated, and transitional
+
+heats$D_bins<-cut(heats$X.D,
+                  breaks=c(0,0.1,0.9,1),
+                  labels=c('none','transitional','dominant')) #defining transitional as more than 10% and less than 90%
+
+head(heats)
+summary(heats)
+
+#now dummy model just to see
+surPlotD = survfit(diedH ~ D_bins, data=heats)
+
+ggsurvplot(
+  surPlotD,
+  data = heats,
+  size = 1,                 # change line size
+  palette =
+    c("royalblue","mediumorchid3","coral"),# custom color palettes
+  conf.int = TRUE,          # Add confidence interval
+#  pval = TRUE,              # Add p-value
+  risk.table = TRUE,        # Add risk table
+  risk.table.col = "strata",# Risk table color by groups
+  legend.labs =
+    c("None", "Transitional","Dominant"),    # Change legend labels
+  risk.table.height = 0.25, # Useful to change when you have multiple groups
+  ggtheme = theme_bw()      # Change ggplot2 theme
+)
+
+
+###################### try to visualize additive effects of %D and Origin 
+
+heats$D_bins<-relevel(heats$D_bins,ref="dominant") #relevel to get pairwise
+heats$Origin<-relevel(heats$Origin,ref="LK3 x LK10 Biparental Cross") #relevel to get pairwise origin difs
+
+heats$OriDbins<-with(heats,factor(Origin:D_bins))
+
+levels(heats$OriDbins)
+
+surPlotOD = survfit(diedH ~ OriDbins, data=heats)
+
+summary(heats)
+
+ggsurvplot(
+  surPlotOD,
+  data = heats,
+  size = 1,                 # change line size
+  palette =
+    c("orchid","purple","thistle2","royalblue","coral","red","lightpink"),# custom color palettes
+  conf.int = TRUE,          # Add confidence interval
+#  pval = TRUE,              # Add p-value
+  risk.table = TRUE,        # Add risk table
+  risk.table.col = "strata",# Risk table color by groups
+#  legend.labs =
+#    c("None", "Transitional","Dominant"),    # Change legend labels
+  risk.table.height = 0.25, # Useful to change when you have multiple groups
+  ggtheme = theme_bw()      # Change ggplot2 theme
+)
+
+#messy - what if we facet by D.bins - YES much better
+
+#dev.new()
+ggsurvplot_facet(
+  surPlotOD,
+  data = heats,
+  facet.by = "D_bins",
+  size = 1,                 # change line size
+  palette =
+    c("#999999","#DDCC77","#EEDD88","#F0E442","#CC6677","#CC79A7","#FFAABB"),# custom color palettes
+  conf.int = TRUE,          # Add confidence interval
+#  pval = TRUE,              # Add p-value
+  risk.table = TRUE,        # Add risk table
+  risk.table.col = "strata",# Risk table color by groups
+#  legend.labs =
+#    c("None", "Transitional","Dominant"),    # Change legend labels
+  risk.table.height = 0.25, # Useful to change when you have multiple groups
+  ggtheme = theme_bw()      # Change ggplot2 theme
+)
+#dev.off()
+
+
+###finally, what if we export genet specific hazard ratio in heat, then in GWAS control for relatedness and Durusdinium dominance
+
+names(traitsFiltered_SymTypeSubset)
+
+traitsFiltered_SymTypeSubset %>%
+    group_by(Origin, Treatment) %>%
+    summarise (propDead = mean(Mortality),meanTOD = mean(TOD)) #No mortality in control; only mortality in heat... 
+
+traitsFiltered_SymTypeSubset$Genet<-relevel(traitsFiltered_SymTypeSubset$Genet,ref="4") #relevel with best surviving genet as reference
+
+summary(traitsFiltered_SymTypeSubset$TOD)
+
+heats<-traitsFiltered_SymTypeSubset %>%
+  filter(Treatment=="Heat") %>%
+  droplevels()
+
+#survival by cross origin and treatment
+iter<-coxme.control(iter.max=500)
+
+diedH=Surv(heats$TOD, heats$Mortality) 
+
+table(diedH) 
+
+survG<-coxme(diedH~Genet+(1|Raceway), data=heats,control=iter) #coefficients might be crazy
+
+summary(survG)
+
+survG_fixef<-fixef(survG)
+
+survG_HR <- exp(survG_fixef)
+
+survG_HR <- as.data.frame(survG_HR)
+
+summary(survG_HR)
+
+head(survG_HR)
+
+hist(survG_HR$survG_HR)
+
+sort(survG_HR$survG_HR)
+
+survG_HR$HR_bin<-survG_HR$survG_HR
+
+survG_HR$HR_bin<-cut(survG_HR$survG_HR,
+                  breaks=c(0,1,2.505775e+15),
+                  labels=c(1,0))
+
+survG_HR
+
+write.csv(survG_HR,file="GenetSurvivalinHeat_coxmeHazardRatioBins.csv",quote=FALSE,row.names=TRUE)
+
+#NOTE its equivalent to binning by no mortality vs any mortality
+
+```
+
+Now, test for differences in surface area growth by cross origin and treatment. Data are zero-inflated - solution: use zero inflated model, but first lets explore distribution of response by predictors
+
+```{r}
+
+#create binary to distinguish zero from non-zero max growth for exploratory plots
+
+traitsAllCrossSym$SA_nonzero<-ifelse(traitsAllCrossSym$SA_dif_cor > 0, 1, 0)
+
+ggplot(traitsAllCrossSym, aes(Treatment, SA_dif_cor, colour = as.factor(SA_nonzero))) + geom_jitter() #does appear to be treatment effect, more zeros in heat
+
+ggplot(traitsAllCrossSym, aes(Origin, SA_dif_cor, colour = as.factor(SA_nonzero))) + geom_jitter() #does appear to be origin effect, more in E-B
+
+ggplot(traitsAllCrossSym, aes(Treatment, SA_dif_cor, colour = as.factor(SA_nonzero))) + geom_jitter()+facet_wrap(~Origin) #not really interaction?
+
+traitsAllCrossSym %>%
+  filter(SA_nonzero==1) %>%
+  ggplot(aes(Treatment, SA_dif_cor, colour = as.factor(Treatment))) + geom_boxplot()+facet_wrap(~Origin)
+
+ggplot(traitsAllCrossSym, aes(Genet, SA_dif_cor, colour = as.factor(SA_nonzero))) + geom_jitter() #genet effect somewhat noisy...origin seems bigger driver
+
+ggplot(traitsAllCrossSym, aes(Raceway, SA_dif_cor, colour = as.factor(SA_nonzero))) + geom_jitter() #raceway effect present, but stratified by treatment
+
+### really seems like treatment is the thing driving low SA growth either 0 or continuous. Would prefer zero-inflated model...
+
+# try glmmTMB with zero inflated gamma distribution
+#Note- cannot include additional random effect of Genet, get infinite residuals in simulations - possibly bc genet is nested within origin??
+SA_dif_model0 <- glmmTMB(SA_dif_cor ~ X.D+Origin+Treatment + (1|Raceway), ziformula = ~Origin+Treatment , family = "ziGamma", data = traitsAllCrossSym)
+
+res0 <- simulateResiduals(fittedModel = SA_dif_model0) #check fits with DHARMa
+plot(res0) #everything is looking pretty darn good now
+testZeroInflation(res0) #all good!
+
+# add in interaction
+SA_dif_model1 <- glmmTMB(SA_dif_cor ~ X.D+Origin*Treatment + (1|Raceway), ziformula = ~Treatment+Origin , family = "ziGamma", data = traitsAllCrossSym)
+
+res1 <- simulateResiduals(fittedModel = SA_dif_model1)
+plot(res1) #everything is looking pretty darn good now
+testZeroInflation(res1) #solved! totally good
+
+# what about interaction in zero inflated mode?
+SA_dif_model2 <- glmmTMB(SA_dif_cor ~ X.D+Origin*Treatment + (1|Raceway), ziformula = ~Treatment*Origin , family = "ziGamma", data = traitsAllCrossSym)
+
+res2 <- simulateResiduals(fittedModel = SA_dif_model2)
+plot(res2) #everything is still looking pretty darn good now
+testZeroInflation(res2) #solved! totally good
+
+
+# and also accounting for symbiont type?
+SA_dif_model3 <- glmmTMB(SA_dif_cor ~ X.D+Origin*Treatment + (1|Raceway), ziformula = ~X.D+Treatment*Origin , family = "ziGamma", data = traitsAllCrossSym)
+
+res3 <- simulateResiduals(fittedModel = SA_dif_model3)
+plot(res3) #everything is looking pretty good
+testZeroInflation(res3) #still good
+
+###okay which model 
+AICtab(SA_dif_model0,SA_dif_model1,SA_dif_model2,SA_dif_model3) #a worse model when including sym in zi model. but not hugely different tbh and its impt to show D has no effect
+
+SA_dif_model3 
+summary(SA_dif_model3)
+Anova(SA_dif_model3) #NOTE this is Wald chi2 test (NO LRT nor F test), only apply to fixed effects of conditional model
+
+#the conditional output represents the zero portion (or a logistic regression) - the zero inflated output represents a "mixture" model of the two distributions - one for the zero subgroup and one for the non-zero subgroup
+#The ziformula is a gamma model turned up side down, it tells you which of your predictors increase the probability of no growth vs some growth. The conditional model tells you which predictors influence the max growth, for those cases where some growth is evident. 
+
+
+#need to create dummy variable to get proper pairwise comparisons for interaction, then rerun stats and do Tukeys
+
+
+SA_dif_model3.1 <- glmmTMB(SA_dif_cor ~ X.D+OriTrt + (1|Raceway), ziformula = ~X.D+OriTrt , family = "ziGamma", data = traitsAllCrossSym)
+
+res3.1 <- simulateResiduals(fittedModel = SA_dif_model3.1)
+plot(res3.1) #same same
+testZeroInflation(res3.1) #good
+
+saI <- glht(SA_dif_model3.1, linfct = mcp(OriTrt = "Tukey"))
+summary(saI) #note that not all contrasts are meaningful, so this is a bit overly conservative, but 
+
+#now lets print table of coefficients
+sum<-summary(SA_dif_model3)
+
+pxt(lme4::formatVC(sum$varcor$cond),"Random effect variances")
+pxt(coef(sum)$cond,"Conditional fixed effects")
+pxt(coef(sum)$zi,"Conditional zero-inflation effects")
+
+#upload code to: https://latexbase.com/d/9eb8490b-dd46-48b1-89ea-258aebec6647 to get tables
+
+
+```
+
+Partial Mortality is also zero inflated - same model structure as above
+
+```{r}
+
+hist(traitsAllCrossSym$PartMort, breaks=20)
+
+#create binary to distinguish zero from non-zero mortality
+
+traitsAllCrossSym$PM_nonzero<-ifelse(traitsAllCrossSym$PartMort > 0, 1, 0)
+
+ggplot(traitsAllCrossSym, aes(Treatment, PartMort, colour = as.factor(PM_nonzero))) + geom_jitter() #def treatment effect
+
+ggplot(traitsAllCrossSym, aes(Origin, PartMort, colour = as.factor(PM_nonzero))) + geom_jitter() #origin effect not clear
+
+ggplot(traitsAllCrossSym, aes(Treatment, PartMort, colour = as.factor(PM_nonzero))) + geom_jitter()+facet_wrap(~Origin) #possibly interaction
+
+ggplot(traitsAllCrossSym, aes(Genet, PartMort, colour = as.factor(PM_nonzero))) + geom_jitter() #genet effect again noisy
+
+ggplot(traitsAllCrossSym, aes(Raceway, PartMort, colour = as.factor(PM_nonzero))) + geom_jitter() #raceway effect present, but stratified by treatment
+
+# again glmmTMB with zero inflated gamma distribution - include Prop D as covariate just to control
+#Might want to consider interaction in zero inflation model...
+PM_dif_model0 <- glmmTMB(PartMort ~ X.D+Origin+Treatment + (1|Raceway), ziformula = ~X.D+Origin+Treatment , family = "ziGamma", data = traitsAllCrossSym)
+
+res0pm <- simulateResiduals(fittedModel = PM_dif_model0)
+plot(res0pm) #niiiiice
+testZeroInflation(res0pm)
+
+PM_dif_model0
+summary(PM_dif_model0)
+Anova(PM_dif_model0) #NOTE this is Wald chi2 test (NO LRT nor F test), only applies to fixed effects of conditional model
+
+#probability of no partial mortality strongly influenced by treatment - nearly 4x more likely to observe no partial mortality in control than in heat
+#WHEN partial mortality is evident, there is a strong effect of Durusdinium, but also origin and treatment
+
+# testing interaction model
+PM_dif_model1 <- glmmTMB(PartMort ~ X.D+Origin*Treatment + (1|Raceway), ziformula = ~X.D+Treatment*Origin , family = "ziGamma", data = traitsAllCrossSym) 
+
+#can't handle interaction...issue is likely complete separation? no instances of partial mortality in Biparentals in control.
+ggplot(traitsAllCrossSym, aes(Treatment, PartMort, colour = as.factor(PM_nonzero))) + geom_jitter()+facet_wrap(~Origin)
+
+#in this case, run reduced model of heat-treated ramets only to try to investigate potential origin effects
+heats<-traitsAllCrossSym %>%
+  filter(Treatment=="Heat") %>%
+  droplevels()
+
+PM_heats_model0 <- glmmTMB(PartMort ~ X.D+Origin + (1|Raceway), ziformula = ~X.D+Origin , family = "ziGamma", data = heats) #model converges without error
+
+res0heats <- simulateResiduals(fittedModel = PM_heats_model0)
+plot(res0heats) #residuals a bit skewed
+testZeroInflation(res0heats) #also lookign good
+
+PM_heats_model0
+summary(PM_heats_model0)
+Anova(PM_heats_model0)
+
+#can we cram in interaction?
+PM_heats_model1 <- glmmTMB(PartMort ~ X.D*Origin + (1|Raceway), ziformula = ~X.D*Origin , family = "ziGamma", data = heats) #some issues arise, again likely due to partial mortality occurring in all symbiodinium dominated genets in heat...
+
+res1heats <- simulateResiduals(fittedModel = PM_heats_model1)
+plot(res1heats) #good
+testZeroInflation(res1heats) #also lookign good
+
+PM_heats_model1
+summary(PM_heats_model1)
+Anova(PM_heats_model1) #no effect of interaction anyway, will go with simpler model
+
+
+#what about among family levels within origin?
+pmOri <- glht(PM_heats_model0, linfct = mcp(Origin = "Tukey"))
+summary(pmOri) #E-H-SI sig diff from E-B - does this make sense?
+
+sub2<-heats %>% #just positive PM
+  filter(PartMort>0)
+
+ggplot(sub2, aes(Origin, PartMort)) + geom_boxplot() #yes
+
+#now lets print table of coefficients
+PMsum<-summary(PM_dif_model0)
+PMsum<-summary(PM_heats_model0)
+
+pxt(lme4::formatVC(PMsum$varcor$cond),"Random effect variances")
+pxt(coef(PMsum)$cond,"Conditional fixed effects")
+pxt(coef(PMsum)$zi,"Conditional zero-inflation effects")
+
+#upload code to: https://latexbase.com/d/9eb8490b-dd46-48b1-89ea-258aebec6647 to get tables
+
+```
+
+Daily Growth Rate
+
+```{r}
+
+hist(traitsAllCrossSym$DailyGrowthRate_cor, breaks=20)
+
+DGR_dif_model <- lmer(DailyGrowthRate_cor ~ X.D+Origin*Treatment  + (1|Genet) + (1|Raceway), data=traitsAllCrossSym) #default is gaussian(identity)
+
+test <- simulateResiduals(fittedModel = DGR_dif_model)
+plot(test) #not terrible, but not perfect...is model too complex?
+
+DGR_dif_model2 <- lmer(DailyGrowthRate_cor ~ X.D+Origin*Treatment  + (1|Raceway), data=traitsAllCrossSym) #
+
+test2 <- simulateResiduals(fittedModel = DGR_dif_model2)
+plot(test2) 
+
+summary(DGR_dif_model2) #what if we decide this model is good enough...
+
+anova(DGR_dif_model2,ddf="Kenward-Roger") #only affect of origin
+
+
+traitsAllCrossSym %>% 
+  ggplot(aes(x = Origin, y = DailyGrowthRate_cor)) + 
+  geom_boxplot() #verify origin effect
+
+rand(DGR_dif_model2) #no effect of raceway...maybe don't need random effect? do see big outliers in biparental
+
+Ori <- glht(DGR_dif_model2, linfct = mcp(Origin = "Tukey"))
+summary(Ori) 
+
+
+```
+
+## Now quantile normalize and export focal trait lists for gwas
+
+No need to regress for other traits at this point, will rely on relatedness matrix to deal with cross origin. Will have to return to full dataset though as there is no a priori reason to subset to just crosses, can include few other randos since we have genomic data for all
+
+```{r}
+
+str(traitsFiltered_SymTypeSubset)
+
+inv.normalize <- function(x) { #this would also tolerate NAs
+  return( qnorm( (rank(x, na.last = "keep") - 0.5) / sum(!is.na(x))))}
+
+
+ByGenetD<-traitsFiltered_SymTypeSubset %>%                   #get ordered vector of genets
+  group_by(Genet) %>%
+  summarise(meanD=mean(X.D,na.rm=TRUE))
+
+ByGenetD$normD<-inv.normalize(ByGenetD$meanD)
+
+  
+
+ByGenetMort<-traitsFiltered_SymTypeSubset %>%                    #get ordered vector of genets
+  filter(Treatment=="Heat") %>%
+  group_by(Genet) %>%
+  summarise(propDead = mean(Mortality))
+
+ByGenetMort$normMort<-inv.normalize(ByGenetMort$propDead)
+
+ByGenetSAc<-traitsFiltered_SymTypeSubset %>%                    #get ordered vector of genets
+  filter(Treatment=="Control") %>%
+  group_by(Genet) %>%
+  summarise(meanSAc = mean(SA_dif_cor,na.rm=TRUE))
+
+summary(ByGenetSAc)
+hist(ByGenetSAc$meanSAc) #very nice distribution - can quantile norm here
+
+ByGenetSAc$normSAc<-inv.normalize(ByGenetSAc$meanSAc)
+
+plot(ByGenetSAc$meanSAc~ByGenetSAc$normSAc)#good, reflects rankings pretty well
+
+hist(ByGenetSAc$normSAc) #and is nice and normal
+
+ByGenetSAh<-traitsFiltered_SymTypeSubset %>%                    #get ordered vector of genets
+  filter(Treatment=="Heat") %>%
+  group_by(Genet) %>%
+  summarise(meanSAh = mean(SA_dif_cor,na.rm=TRUE))
+
+ByGenetSA<-full_join(ByGenetSAc,ByGenetSAh) 
+
+summary(ByGenetSA)
+
+ByGenetSA %>%
+  filter(meanSAh==0)
+
+ByGenetSA$percSA<-(ByGenetSA$meanSAh/ByGenetSA$meanSAc) #create value representing mean proportion of SA growth maintained in heat by a given genet. 1 = no change by treatment
+
+summary(ByGenetSA)
+
+ByGenetSA %>%
+  filter(percSA>1) #few genets grew remarkably more in heat
+
+ByGenetSA$percSAnorm<-inv.normalize(ByGenetSA$percSA)
+
+plot(ByGenetSA$percSAnorm~ByGenetSA$percSA)#good, still reflects rankings pretty well
+
+hist(ByGenetSA$percSAnorm) #and is still nice and normal
+
+ByGenetA<-full_join(ByGenetD,ByGenetMort) 
+
+ByGenet<-full_join(ByGenetA,ByGenetSA)
+
+head(ByGenet)
+tail(ByGenet)
+
+p1<-ByGenet %>%
+  ggplot(aes(x=meanD)) +
+    geom_histogram( color="grey60", alpha=0.5, position = 'identity') +
+  labs(x="Mean Proportion Durusdinium") #really non-normal, more approximates binomial OR ordinal if we bin intermediate sym types as in stats analysis
+
+p2<-ByGenet %>%
+  ggplot(aes(x=normD)) +
+    geom_histogram( color="grey60", alpha=0.5, position = 'identity') +
+  labs(x="Quantile Normalized Proportion Durusdinium")#transform makes it normal, but appears to randomly assign ones to some positive value and that is not really appropriate either IMO
+
+ByGenet %>%
+  ggplot(aes(x=propDead)) +
+    geom_histogram( color="grey60", alpha=0.5, position = 'identity') #really more like a categorical ordinal 
+
+ByGenet %>%
+  ggplot(aes(x=normMort)) +
+    geom_histogram( color="grey60", alpha=0.5, position = 'identity')
+
+p3<-ByGenetD %>%
+  ggplot(aes(x = meanD, y = normD)) + 
+  geom_point() +
+  labs(x="Mean Proportion Durusdinium", y="Quantile Normalized Proportion Durusdinium")
+
+grid.arrange(p1, p2, p3, nrow = 1) #IS transform reasonable
+
+# lets try a plan B which will also be to treat traits as binary and ordinal
+
+ByGenet$D_3bins<-cut(ByGenet$meanD,
+                  breaks=c(0,0.1,0.9,1),
+                  labels=c('0','1','2')) #defining transitional as more than 10% but less than 90%
+
+ByGenet$D_binary<-cut(ByGenet$meanD, #anything less than 90% is 0
+                  breaks=c(0,0.9,1),
+                  labels=c('0','1')) 
+
+ByGenet$Mort_bins<-cut(ByGenet$propDead,
+                  breaks=c(-0.1,0.25,0.5,0.75,1),
+                  labels=c('3','2','1','0'))
+
+ByGenet$Mort_binary<-cut(ByGenet$propDead,
+                  breaks=c(-0.1,0.25,1),
+                  labels=c('1','0'))
+
+plot(ByGenet$Mort_bins)
+plot(ByGenet$Mort_binary)
+
+head(ByGenet)
+str(ByGenet)
+
+
+
+# fiByGenet# finally, need to read in additional sample ID info to organize genets by seq sample name for GWAS
+
+ids=read.csv("~/Dropbox/CarlsLab/ResearchProjects/NOAA_RuthGates/GenomeAnalysis/RelatednessKey.csv",stringsAsFactors=TRUE) # read in sample name key
+nrow(ids)
+head(ids)
+
+ids<-ids[,c(1,3,4,5)]
+
+names(ids)<-c("seqID","cross" , "sampleID","Genet")
+
+head(ids)
+str(ids)
+
+ids$Genet<-as.factor(ids$Genet)
+
+ByGenetAnnot<-full_join(ids,ByGenet, by="Genet")
+
+head(ByGenetAnnot)
+str(ByGenetAnnot)
+summary(ByGenetAnnot)
+
+ByGenetAnnot %>%
+  filter(is.na(Genet)) #good - just missing wild adult traits
+
+#obtain sample order from vcf/.fam file
+order<-c('21073D-03-01_S46_L003',	'21073D-03-02_S75_L005',	'21073D-03-03_S76_L005',	'21073D-03-04_S77_L005',	'21073D-03-05_S47_L003',	'21073D-03-06_S78_L005',	'21073D-03-07_S48_L003',	'21073D-03-08_S79_L005',	'21073D-03-100_S118_L003',	'21073D-03-101_S99_L005',	'21073D-03-102_S100_L005',	'21073D-03-103_S101_L005',	'21073D-03-104_S102_L005',	'21073D-03-105_S119_L003',	'21073D-03-106_S120_L003',	'21073D-03-107_S121_L003',	'21073D-03-108_S122_L003',	'21073D-03-109_S123_L003',	'21073D-03-10_S49_L003',	'21073D-03-110_S124_L003',	'21073D-03-111_S125_L003',	'21073D-03-112_S126_L003',	'21073D-03-113_S127_L003',	'21073D-03-114_S128_L003',	'21073D-03-115_S129_L003',	'21073D-03-116_S130_L003',	'21073D-03-117_S131_L003',	'21073D-03-118_S132_L003',	'21073D-03-119_S133_L003',	'21073D-03-11_S50_L003',	'21073D-03-120_S134_L003',	'21073D-03-121_S135_L003',	'21073D-03-122_S136_L003',	'21073D-03-123_S137_L003',	'21073D-03-124_S138_L003',	'21073D-03-125_S139_L003',	'21073D-03-126_S140_L003',	'21073D-03-127_S141_L003',	'21073D-03-128_S142_L003',	'21073D-03-129_S143_L003',	'21073D-03-12_S80_L005',	'21073D-03-130_S144_L003',	'21073D-03-131_S145_L003',	'21073D-03-132_S146_L003',	'21073D-03-133_S147_L003',	'21073D-03-134_S148_L003',	'21073D-03-135_S149_L003',	'21073D-03-136_S150_L003',	'21073D-03-137_S151_L003',	'21073D-03-138_S152_L003',	'21073D-03-139_S153_L003',	'21073D-03-140_S103_L005',	'21073D-03-141_S104_L005',	'21073D-03-142_S154_L003',	'21073D-03-143_S105_L005',	'21073D-03-144_S155_L003',	'21073D-03-145_S106_L005',	'21073D-03-146_S107_L005',	'21073D-03-147_S156_L003',	'21073D-03-148_S108_L005',	'21073D-03-149_S109_L005',	'21073D-03-14_S51_L003',	'21073D-03-150_S110_L005',	'21073D-03-152_S111_L005',	'21073D-03-153_S129_L006',	'21073D-03-154_S157_L003',	'21073D-03-155_S158_L003',	'21073D-03-156_S159_L003',	'21073D-03-157_S160_L003',	'21073D-03-15_S52_L003',	'21073D-03-16_S53_L003',	'21073D-03-17_S85_L005','21073D-03-18_S54_L003',	'21073D-03-19_S86_L005',	'21073D-03-20_S55_L003',	'21073D-03-21_S81_L005',	'21073D-03-23_S56_L003','21073D-03-24_S57_L003',	'21073D-03-25_S58_L003',	'21073D-03-26_S59_L003',	'21073D-03-27_S60_L003',	'21073D-03-28_S61_L003',	'21073D-03-30_S63_L003',	'21073D-03-31_S64_L003',	'21073D-03-32_S82_L005',	'21073D-03-33_S65_L003',	'21073D-03-34_S66_L003',	'21073D-03-35_S67_L003',	'21073D-03-36_S68_L003',	'21073D-03-37_S69_L003',	'21073D-03-38_S70_L003',	'21073D-03-39_S71_L003',	'21073D-03-40_S72_L003',	'21073D-03-41_S73_L003',	'21073D-03-42_S74_L003',	'21073D-03-43_S75_L003',	'21073D-03-44_S76_L003',	'21073D-03-45_S77_L003',	'21073D-03-46_S78_L003',	'21073D-03-47_S79_L003',	'21073D-03-49_S80_L003',	'21073D-03-51_S81_L003',	'21073D-03-52_S82_L003',	'21073D-03-53_S83_L003',	'21073D-03-54_S84_L003',	'21073D-03-55_S85_L003',	'21073D-03-56_S86_L003',	'21073D-03-57_S87_L003',	'21073D-03-58_S90_L005',	'21073D-03-59_S88_L003',	'21073D-03-60_S89_L003',	'21073D-03-61_S90_L003',	'21073D-03-62_S91_L003',	'21073D-03-63_S92_L003',	'21073D-03-64_S93_L003',	'21073D-03-65_S94_L003',	'21073D-03-66_S91_L005',	'21073D-03-67_S95_L003',	'21073D-03-68_S96_L003',	'21073D-03-69_S97_L003',	'21073D-03-70_S98_L003',	'21073D-03-71_S99_L003',	'21073D-03-72_S100_L003',	'21073D-03-73_S101_L003',	'21073D-03-74_S102_L003',	'21073D-03-75_S103_L003',	'21073D-03-76_S104_L003',	'21073D-03-77_S105_L003',	'21073D-03-78_S106_L003',	'21073D-03-79_S92_L005',	'21073D-03-80_S107_L003',	'21073D-03-81_S108_L003',	'21073D-03-82_S93_L005',	'21073D-03-83_S94_L005',	'21073D-03-84_S109_L003',	'21073D-03-85_S110_L003',	'21073D-03-86_S111_L003',	'21073D-03-87_S95_L005',	'21073D-03-88_S112_L003',	'21073D-03-89_S113_L003',	'21073D-03-90_S96_L005',	'21073D-03-91_S97_L005',	'21073D-03-92_S98_L005',	'21073D-03-93_S114_L003',	'21073D-03-94_S115_L003',	'21073D-03-95_S116_L003',	'21073D-03-96_S117_L003',	'21073D-03-97_S161_L003',	'21073D-03-98_S162_L003',	'21073D-03-99_S163_L003',	'21073D-02-29_S165_L003')
+
+order<-as.data.frame(order)
+
+rownames(order)<-order$order
+
+rownames(ByGenetAnnot)<-ByGenetAnnot$seqID
+
+ByGenetAnnot<-ByGenetAnnot[rownames(order),]
+
+ByGenetAnnot$seqID
+
+names(ByGenetAnnot)
+
+summary(ByGenetAnnot) #down to missing traits for just one genet
+
+write.table(x = ByGenetAnnot, 
+              file = "Phenotypes.tab", 
+              row.names = F, 
+              col.names = F, 
+              quote = F, 
+              sep = '\t')
+
+write.table(x = ByGenetAnnot, 
+              file = "PhenotypesHeader.tab", 
+              row.names = F, 
+              col.names = TRUE, 
+              quote = F, 
+              sep = '\t')
+
+ByGenetAnnot %>%
+  filter(is.na(D_binary))
+
+traitsFiltered_SymTypeSubset %>%
+  filter(Genet=="358") #yes, missing in OG dataset okay
+
+```

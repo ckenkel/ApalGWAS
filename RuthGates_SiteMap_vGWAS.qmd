@@ -1,0 +1,274 @@
+---
+title: "Ruth Gates Map of Sites"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Load all of the needed libraries.
+
+```{r}
+
+#install.packages(c("cowplot", "googleway", "ggplot2", "ggrepel", 
+#"ggspatial", "libwgeom", "sf", "rnaturalearth", "rnaturalearthdata"))
+
+#install.packages("ggrepel")
+
+#devtools::install_github('ropensci/rnaturalearthhires')
+
+#Basic foundations; set color theme
+library("ggplot2")
+theme_set(theme_bw())
+library("sf")
+library("dplyr")
+
+#Country Data and scaling aesthetics
+library("rnaturalearth")
+library("rnaturalearthdata")
+library("rnaturalearthhires")
+library("ggrepel")
+library("ggspatial")
+
+#world <- ne_countries(country="United States of America",scale = "medium", returnclass = "sf")
+#class(world)
+
+# https://docs.ropensci.org/rnaturalearth/articles/rnaturalearth.html
+
+# coastline - note smaller numbers = higher resolution! L = large (high res)
+coastline10 <- ne_download(
+  scale = 10L,
+  type = "coastline",
+  category = "physical"
+)
+#plot(coastline10, col = "blue")
+
+
+#color scheme
+#https://jrnold.github.io/ggthemes/reference/colorblind.html
+
+```
+
+## Define map boundaries and add points based on list of desired coordinates
+
+```{r}
+
+#First define list of larval source sites
+
+#Elbow: 25.1415 N 80.2623 W
+#Looe: 24.54609 N 81.40576 W
+#Horseshoe: 25.1399° N, 80.2946° W
+#Sand Island: 25.018267 -80.368417 25.500073°N 80.183415°W
+#Brewster: 25.566436° N, -80.099466° W
+#IC2R3 Nursery: 24.6617° N, -81.4554° W
+
+(crosses <- data.frame(longitude = c(-80.2623, -81.40576, -80.2946, -80.183415, -80.099466), latitude = c(25.1415, 
+    24.54609,25.1399, 25.500073,25.566436)))
+crosses
+
+(LKbi <- data.frame(longitude = c(-81.40576), latitude = c( 24.54609)))
+LKbi
+
+(EB <- data.frame(longitude = c(-80.2623,-80.099466), latitude = c( 25.1415, 25.566436)))
+EB
+
+(EHSI <- data.frame(longitude = c(-80.2946,-80.183415), latitude = c( 25.1399, 25.500073)))
+EHSI
+
+(nursery <- data.frame(longitude = c(-81.4554), latitude = c(24.6617)))
+nursery
+
+#Also Holland Outplant Destinations
+#Dave's Ledge	24.53051	-81.48734
+#Eastern Dry Rocks	24.45948	-81.84412
+#Looe Key	24.54667	-81.40214
+
+#Bahia Honda	24.58908	-81.24203
+#Big Pine Shoals	24.56867	-81.32655
+#Maryland Shoals	24.51036	-81.56991
+#E. Sambo	24.49305	-81.65961
+#W. Sambo	24.48268	-81.70334
+#Marker 32	24.47408	-81.7426
+
+(sites <- data.frame(longitude = c(-81.48734,-81.84412,-81.40214,-81.24203,-81.32655,-81.56991,-81.65961,-81.70334,-81.7426), latitude = c(24.53051, 24.45948,24.54667,24.58908,24.56867,24.51036,24.49305,24.48268,24.47408)))
+sites
+
+# Test dimensions and colors
+ggplot(data = coastline10) + #adjust map selection here
+    geom_sf() +
+  geom_point(data = LKbi, aes(x = longitude, y = latitude), size = 3.5, 
+        shape = 21, fill = "skyblue") +
+    geom_point(data = EHSI, aes(x = longitude, y = latitude), size = 3, 
+        shape = 21, fill = "red") +
+    geom_point(data = EB, aes(x = longitude, y = latitude), size = 3, 
+        shape = 21, fill = "purple") +
+    geom_point(data = sites, aes(x = longitude, y = latitude), size = 1.5, 
+        shape = 23, fill = "goldenrod") +
+  geom_point(data = nursery, aes(x = longitude, y = latitude), size = 2, 
+        shape = 8, col = "darkred") +
+    coord_sf(xlim = c(-82.5, -79.5), ylim = c(24, 26.5), expand = FALSE)
+
+```
+
+## Try slightly better plot function and add in location of Miami for reference and scale bars
+
+```{r}
+
+#v2, add labels
+
+#Elbow: 25.1415 N 80.2623 W
+#Looe: 24.54609 N 81.40576 W
+#Horseshoe: 25.1399° N, 80.2946° W
+#Sand Island: 25.018267 -80.368417 25.500073°N 80.183415°W
+#Brewster: 25.566436° N, -80.099466° W
+#Dave's Ledge	24.53051	-81.48734
+#Eastern Dry Rocks	24.45948	-81.84412
+#IC2R3 Nursery: 24.6617° N, -81.4554° W
+
+Miami <- data.frame(state = rep("Florida", 1), city = c("Miami","Elbow","Looe Key","Horseshoe","Sand Is","Brewster","Dave's Ledge","Eastern Dry Rocks","IC2R3 Nursery"), lat = c(25.7616798,25.1415,24.54609,25.1399, 25.500073,25.566436,24.53051,24.45948,24.6617), lng = c(-80.1917902,-80.2623,-81.40576,-80.2946,-80.183415, -80.099466,-81.48734,-81.84412,-81.4554))
+
+(Miami <- st_as_sf(Miami, coords = c("lng", "lat"), remove = FALSE, 
+    crs = 4326, agr = "constant"))
+
+# Final Plot
+ggplot(data = coastline10) +
+    geom_sf() +
+  geom_sf(data = Miami) +
+  geom_text_repel(data = Miami, aes(x = lng, y = lat, label = city), 
+        fontface = "bold", nudge_x = c(1, 0.5, 0.5, -0.75, 0.5, 0.25,0.25,-0.1,-0.5), nudge_y = c(0.25, 
+            0.1, 0, -0.1, -0.05,0.1,-0.2,-0.1,0.2)) +
+  coord_sf(xlim = c(-82.4, -79.5), ylim = c(24.25, 26.5), expand = FALSE)+
+  geom_point(data = LKbi, aes(x = longitude, y = latitude), size = 3.5, 
+        shape = 21, fill = "#999999") +
+  geom_point(data = EB, aes(x = longitude, y = latitude), size = 3, 
+        shape = 21, fill = "#DDCC77") +
+    geom_point(data = EHSI, aes(x = longitude, y = latitude), size = 3, 
+        shape = 21, fill = "#CC6677") +
+    geom_point(data = sites, aes(x = longitude, y = latitude), size = 1.5, 
+        shape = 23, fill = "grey20") +
+  geom_point(data = nursery, aes(x = longitude, y = latitude), size = 3, 
+        shape = 22, fill = "#0072B2") +
+  annotation_scale(location = "tr", width_hint = 0.4) +
+    annotation_north_arrow(location = "br", which_north = "true", 
+       # pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+        style = north_arrow_fancy_orienteering) +
+    xlab("Longitude") + ylab("Latitude") +
+  theme(panel.grid.major = element_line(color = gray(0.1), linetype = "dashed", 
+        size = 0.1)) #panel.background = element_rect(fill = "azure")
+
+```
+
+## Plot Location Inset
+
+```{r}
+
+# Bigger FL map
+ggplot(data = coastline10) +
+    geom_sf() +
+    coord_sf(xlim = c(-88, -78), ylim = c(24, 34), expand = FALSE)
+
+```
+
+
+## Raceway Temperature Ramp Profiles - read in and QC
+
+```{r}
+
+#read in raceway HOBO data, avoid first row
+fourN <- read.csv(file="~/Dropbox/CarlsLab/ResearchProjects/NOAA_RuthGates/WaterQual/RW4NRG2.0.csv", skip = 1, header = TRUE)
+fourS <- read.csv(file="~/Dropbox/CarlsLab/ResearchProjects/NOAA_RuthGates/WaterQual/RW4SRG2.0.csv", skip = 1, header = TRUE)
+fiveN <- read.csv(file="~/Dropbox/CarlsLab/ResearchProjects/NOAA_RuthGates/WaterQual/RW5NRG2.0.csv", skip = 1, header = TRUE)
+fiveS <- read.csv(file="~/Dropbox/CarlsLab/ResearchProjects/NOAA_RuthGates/WaterQual/RW5SRG2.0.csv", skip = 1, header = TRUE)
+sixN <- read.csv(file="~/Dropbox/CarlsLab/ResearchProjects/NOAA_RuthGates/WaterQual/RW6NRG2.0.csv", skip = 1, header = TRUE)
+sixS <- read.csv(file="~/Dropbox/CarlsLab/ResearchProjects/NOAA_RuthGates/WaterQual/RW6SRG2.0.csv", skip = 1, header = TRUE)
+
+fourN[1,] #109
+fourS[1,] #109
+fiveN[1,] #1
+fiveS[1,] #979
+sixN[1,] #109
+sixS[1,] #979
+#must truncate all to 3/25 at 11a
+
+tail(fourN) #6841
+tail(fourS) #6849
+tail(fiveN) #6733
+tail(fiveS) #7711
+tail(sixN) #6841
+tail(sixS) #7711
+
+#must truncate all to end of expt - 5/11 at 5:00a
+
+fourNt<-fourN[109:6841,]
+fourSt<-fourS[109:6849,]
+fiveNt<-fiveN[1:6733,]
+fiveSt<-fiveS[979:7711,]
+sixNt<-sixN[109:6841,]
+sixSt<-sixS[979:7711,]
+
+fourNt[1,] 
+fourSt[1,] 
+fiveNt[1,] 
+fiveSt[1,] 
+sixNt[1,] 
+sixSt[1,] #all fixed
+
+tail(fourNt) 
+tail(fourSt) 
+tail(fiveNt) 
+tail(fiveSt) 
+tail(sixNt) 
+tail(sixSt) #all fixed
+
+nrow(fourNt) #7511
+nrow(fourSt) #7519
+nrow(fiveNt) #7511
+nrow(fiveSt) #7511
+nrow(sixNt) #7511
+nrow(sixSt) #7511
+
+
+#now merge by Date.Time..GMT.04.00
+
+#make common Temp column
+names(fourNt)[3]<-"Temp"
+names(fourSt)[3]<-"Temp"
+names(fiveNt)[3]<-"Temp"
+names(fiveSt)[3]<-"Temp"
+names(sixNt)[3]<-"Temp"
+names(sixSt)[3]<-"Temp"
+
+
+comTemp <- bind_rows(fourNt, fourSt, fiveNt,fiveSt,sixNt,sixSt, .id = "raceway")
+
+summary(comTemp)
+head(comTemp)
+
+#format date time
+
+comTemp$Date.Time..GMT.04.00 <- as.POSIXct(comTemp$Date.Time..GMT.04.00, format = "%m/%d/%y %I:%M:%S")
+
+comTemp[comTemp$Temp < 26, ]
+
+```
+
+## Raceway Temperature Ramp Profiles - now plot
+
+```{r}
+
+#
+
+#line plot with individual points in jitter/transparency
+ggplot(comTemp, aes(x = Date.Time..GMT.04.00, y = Temp, color = raceway)) +
+  geom_jitter(alpha = 0.1, size = 1)+
+  geom_smooth()+
+  scale_color_manual(values=c("#56B4E9","#D55E00","tomato3","tomato2","deepskyblue3","deepskyblue2")) +
+  ylab("Temperature")+
+  xlab(NULL)+
+  theme(legend.position = "none")
+
+```
