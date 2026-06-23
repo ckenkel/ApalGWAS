@@ -4,7 +4,7 @@ Biodiversity losses continue to outpace traditional management, underscoring the
 Files in this repository 
 -----------
 
-1. Apal_GWAS.txt: Annotated bioinformatic workflow for genotyping and imputation (including read QC, filtering and genotype calls) and GWAS (accounting for relatedness and dominant endosymbiont type). Custom shell scripts used for the genotyping an imputation pipeline can be found in the sister repository at https://github.com/ckenkel/ApalConGen and additional shell scripts used for GWAS analysis are listed below. Installation instructions are given for other published softwares. Note that this pipeline was written for a cluster which uses a SLURM scheduler. 
+1. Apal_GWAS.txt: Annotated bioinformatic workflow for genotyping and imputation (including read QC, filtering and genotype calls) and GWAS (accounting for relatedness and dominant endosymbiont type). Custom shell scripts used for the genotyping and two-step imputation pipeline can be found in the sister repository at https://github.com/ckenkel/ApalConGen while additional shell scripts used for GWAS analysis are listed below. Installation instructions are given for other published softwares. Note that this pipeline was written for a cluster which uses a SLURM scheduler. 
 	- Additional Shell Scripts specific to GWAS analysis:
 	  - KINGsub.sh
 	  - KINGmerge.sh
