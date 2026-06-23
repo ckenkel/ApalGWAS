@@ -24,8 +24,9 @@ Files in this repository
 2. RuthGates_SiteMap_vGWAS.qmd: Annotated R script for generating site map as shown in Figure 1
    
 3. RuthGates_SurvivalGrowthSymTypesQC_00.qmd: Annotated R script for QC of trait data and integration of qPCR data for symbiont typing. 
-	- Input file:
-	- Input file: 
+	- Input file: GMMetadataFinal_FinalMetaData_29Apr24.csv
+	- Input file: RG_sym_host_Tech_Reps_Averaged_NewCorrectionCalc_plusCV.csv
+    - Output file: traitsFiltered_SymTypeSubset.rds 
 
 4. RuthGates_SurvivalGrowthSymTypesStats_01.qmd and RuthGates_SurvivalGrowthSymTypesPlots_02.qmd: Annotated R scripts for visualization and statistical analyses of QC-ed trait data as well as plotting traits as a function of genotype dosage post-GWAS.
 	- Input file: pixy_EBonly_pi.txt
