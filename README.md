@@ -28,13 +28,11 @@ Files in this repository
 	- Input file: RG_sym_host_Tech_Reps_Averaged_NewCorrectionCalc_plusCV.csv
     - Output file: traitsFiltered_SymTypeSubset.rds 
 
-4. RuthGates_SurvivalGrowthSymTypesStats_01.qmd and RuthGates_SurvivalGrowthSymTypesPlots_02.qmd: Annotated R scripts for visualization and statistical analyses of QC-ed trait data as well as plotting traits as a function of genotype dosage post-GWAS.
-	- Input file: pixy_EBonly_pi.txt
-	- Input file: AllCHR_GL_allLoci_realign_IGP099_IMP_DR2099_dummyID_binary_fileset_KINGrelate.kin0
-	- Input file: AllCHR_ExptIMPfilt_HapParent_Merge_Filt_dummyID_binary_fileset_KINGrelate.kin0
+4. RuthGates_SurvivalGrowthSymTypesStats_01.qmd and RuthGates_SurvivalGrowthSymTypesPlots_02.qmd: Annotated R scripts for visualization and statistical analyses of QC-ed trait data as well as plotting traits as a function of genotype dosage post-GWAS. Script to generate normalized phenotypes for GWAS.
+	- Input file: traitsFiltered_SymTypeSubset.rds 
 	- Input file: RelatednessKey.csv
-	- Input file: AllCHR_ExptIMPfilt_HapParent_Merge_Filt_dummyID_binary_fileset_KINGrelate_matrix.king
-	- Input file: AllCHR_ExptIMPfilt_HapParent_Merge_Filt_dummyID_binary_fileset_KINGrelate_matrix.king.id
+	- Input file: GWAS_SNPsOfInterest.vcf.gz
+	- Output file: Phenotypes.tab
 
 5. ApalmMorphologicalPlasticity_SAgrowth.R: Annotated R script for QC, visualization and statistical analyses of surface area growth in A. palmata field transplants.
 	- Input file: ApalmMorphologicalPlasticity_rready.csv
