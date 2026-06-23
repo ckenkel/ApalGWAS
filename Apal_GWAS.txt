@@ -1,0 +1,791 @@
+############# cleaning, filtering and mapping reads
+
+filtAll.sh  job.sh  map.sh  mapUnpair.sh  picard.sh  
+
+#generate list of files to process, retaining "wild" FL Apal, N=11 upper and lower keys (for heterzygosity comparison, will use same sites as IDed in shallow) and high coverage batch cross individuals for imputation validation
+
+ls -1 *R1_001.fastq | awk -F '_R1.' '{print $1}'  > ID
+
+# make config file for job array
+cat -n ID > config.txt
+
+# nano in and add headers to config.txt file: ArrayTaskID sample, separated by a tab
+
+# add to top of job files to specify number of tasks in array and name outputs as sample name
+#SBATCH --array=1-11
+config=/scratch1/ckenkel/ApalWGS/Haplotype/config.txt
+export NAME=$(awk -v ArrayTaskID=$SLURM_ARRAY_TASK_ID '$1==ArrayTaskID {print $2}' $config)
+
+
+# first trimming
+
+sbatch -J Trim trimAll.sh 
+
+# filtering
+
+sbatch -J Filt filtAll.sh 
+
+# then mapping
+###
+
+sbatch -J Map map.sh 
+sbatch -J MapUnp mapUnpair.sh
+
+# merge and mark dups
+
+sbatch -J picard picard.sh  
+
+
+
+###### output stats ######
+# output reads passing stats for raw, trimmed, clean files (paired and unpaired)
+sbatch -J Nreads Nreads.sh
+
+# output mapping stats by partner (number and % mapped) - bamtools module is down...
+sbatch -J mapstats ../scripts/mapstats.sh
+
+# paste all stats together and summarize in excel
+paste ../IDall Nreads1_raw.txt Nreads2_raw.txt Nreads1_trim.txt Nreads2_trim.txt Nreads1_trim_Unp.txt Nreads2_trim_Unp.txt Nreads1_clean.txt Nreads2_clean.txt Nreads_clean_Unp.txt host_mapstats.txt Unp_host_mapstats.txt sym_mapstats.txt Unp_sym_mapstats.txt > NreadsAll.txt
+
+# output coverage by partner
+sbatch -J cov ../scripts/cov.sh
+
+# all files will go into 'stats' directory so they are easy to locate
+
+################## create low filter vcf file for imputation - require decent quality for genotype calls but no filtering for missingness bc unnecessary at this stage 
+
+##excluding some bams from final set due to low yield and duplication of sample in ref panel that would screw up imputation
+## see notes in https://docs.google.com/spreadsheets/d/1upza3HZ2iYng7UFB1Mf_2wolfvBivbbjT4I-75KfWWc/edit?gid=0#gid=0
+
+#in the final_bams directory:
+
+cat bams | awk -F '.host' '{print $1}'  > ID #good, 150 samples
+
+# make config file for job array
+cat -n ID > config.txt
+# nano in and add headers to config file: ArrayTaskID sample, separated by a tab
+
+mkdir ../vcfSanger
+
+#################################################
+#### first single genotyping
+#################################################
+# will generate one vcf per sample
+# contents of script SingleCall.sh below -- will submit one job per sample
+# need config file which has one column with ArrayTaskID (1-XX) and other column sample ID (ID1-IDXX)
+
+mamba activate /project/ckenkel_26/condaEnvs/beagle #see below for reference panel how to create this mamba library. Run this then submit the whole thing as a job??
+
+# adding in min map quality (q) of 40 (99.99% confidence) and min base quality (Q) of 20 (99% confidence) during mpileup (note this is different than what Fuller 2020 did)
+
+config=/scratch1/ckenkel/ApalWGS/Expt/final_bams/config.txt
+export NAME=$(awk -v ArrayTaskID=$SLURM_ARRAY_TASK_ID '$1==ArrayTaskID {print $2}' $config)
+
+
+####### generate VCF per sample with min mapQ=40 and minbaseQ=20 - contents of vcf.sh
+
+export REF=/project/ckenkel_26/RefSeqs/ApalGenome/ApalmGenome_vSanger/GCA_964030605.1/GCA_964030605.1_jaAcrPala1.1_genomic.fna
+
+bcftools mpileup -f $REF -q 40 -Q 20 -Ou -A $NAME'.host.marked_duplicates.bam' \
+-a FORMAT/AD,FORMAT/ADF,FORMAT/ADR,FORMAT/DP,FORMAT/SP,INFO/AD,INFO/ADF,INFO/ADR \
+| bcftools call -m -Oz -f GQ,GP -W=tbi -o ../vcfSanger/$NAME'.vcf.gz' 
+
+
+#################################################                                           
+#### now merging sample vcfs
+#################################################
+
+mamba activate /project/ckenkel_26/condaEnvs/beagle #see below for reference panel how to create this mamba library. Run this then submit the whole thing as a job
+
+# need config file with first column ArrayTaskID second column CHR ID and list of vcfs
+
+cat -n /project/ckenkel_26/RefSeqs/ApalGenome/ApalmGenome_vSanger/CHR_list.txt > chromOZ.txt
+# nano in and add headers to config file: ArrayTaskID sample, separated by a tab
+
+ls *vcf.gz > vcf_list
+
+#### merge our sequencing samples by CHRomosome
+
+export config=/scratch1/ckenkel/ApalWGS/Expt/vcfSanger/chromOZ.txt
+export CHR=$(awk -v ArrayTaskID=$SLURM_ARRAY_TASK_ID '$1==ArrayTaskID {print $2}' $config)
+
+# enter your job specific code below this line - just one task, no array this time
+
+# merge sample vcfs into single vcf by chromosome (done to speed up processing time)
+bcftools merge -r $CHR -l vcf_list -m both -i IDV:sum,DP:sum,DP4:sum,AD:sum,MQ:avg -W=tbi -o $CHR'_ApalShal.allLoci.vcf.gz' 
+
+
+### concatenate chromosomes together
+
+# contents of concatCHR.sh below
+
+# make list of files to merge and remove header line
+awk '{print $2}' chromOZ.txt | sed 's/$/_ApalShal.allLoci.vcf.gz/g' | grep -v sample > cat_list
+
+
+# concatenate chromosomes together
+bcftools concat -f cat_list -o ApalShal_merge150sam.allLoci.vcf.gz
+
+# remove INFO/ADF and INFO/ADR so no one gets confused -- these values are just filled in from first sample
+# note that other INFO tags not specified in merging are also just reflecting the first sample so be careful when filtering
+# ALSO set ID for SNPs for later QC work; note using '+' so only missing IDs will be set (presumably all...)
+
+bcftools annotate -x INFO/ADF,INFO/ADR --set-id +'%CHROM\_%POS\_%REF\_%FIRST_ALT' ApalShal_merge150sam.allLoci.vcf.gz -o ApalShal_merge150sam.allLoci.ann.vcf.gz
+
+
+# check how many loci -- note this is mono and polymorphic
+bcftools query -f '%CHROM\t%POS\n' ApalShal_merge150sam.allLoci.ann.vcf.gz | wc -l
+#313,055,213 #same
+
+
+########################################## NEW run 
+- having mapped against SANGER ref - January 2025
+##########################################
+
+####### Impute with beagle
+
+#first make conda environment for beagle with required software
+module purge
+module load conda
+mamba init bash
+source ~/.bashrc
+mamba create --prefix /project2/ckenkel_26/NEWFILES/ckenkel_tmp/condaEnvs/beagle
+mamba activate /project2/ckenkel_26/NEWFILES/ckenkel_tmp/condaEnvs/beagle
+mamba install bcftools=1.21
+conda install bioconda::eagle2
+conda install -c r r-base
+conda install -c conda-forge r-data.table
+conda install -c conda-forge r-sm
+
+
+#have all panel stuff and map from Nick...maybe just try rough pass and see after a few checks to confirm format is as I expect?
+https://github.com/mistergroot/apal_reference_panel/blob/main/jupyter_notebooks/l_beagle_microarray_imputation.ipynb
+
+
+#head of the reference panel vcf 
+
+##INFO=<ID=AC_Hom,Number=A,Type=Integer,Description="Allele counts in homozygous genotypes">
+##INFO=<ID=AC_Het,Number=A,Type=Integer,Description="Allele counts in heterozygous genotypes">
+##INFO=<ID=AC_Hemi,Number=A,Type=Integer,Description="Allele counts in hemizygous genotypes">
+##INFO=<ID=MAF,Number=1,Type=Float,Description="Frequency of the second most common allele">
+##INFO=<ID=HWE,Number=A,Type=Float,Description="HWE test (PMID:15789306); 1=good, 0=bad">
+##INFO=<ID=ExcHet,Number=A,Type=Float,Description="Test excess heterozygosity; 1=good, 0=bad">
+##bcftools_pluginVersion=1.16+htslib-1.16
+##bcftools_pluginCommand=plugin fill-tags -- -t all; Date=Fri Sep 27 16:42:12 2024
+##bcftools_viewCommand=view -O b; Date=Fri Sep 27 16:42:12 2024
+##bcftools_viewCommand=view -O z ../calls/all.phased.tagged.bcf; Date=Sun Oct 20 16:13:42 2024
+#CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  A22042  A22054  A22065  A22066  A22079  A22090  A22094  A22097  A22098  A22120  A22123  A22124  A22126  A22130  A22132  A22133  A22137  A22139  A22142  A22144  A22146  A22165  A22230  A22231  A22233  A22240  A22241  A22249  Apal-005_kenkel Apal-016_kenkel Apal-044_kenkel Apal-047_kenkel A22036  A22037  A22048  A22064  A22067  A22071  A22077  A22080  A22087  A22089  A22101  A22102  A22116  A22129  A22140  A22148  A22152  A22160  A22225  A22226  A22228  AP66_kenkel     A1008
+   A11     A16099  A16589  A32     A93     A94     A95     DR1_kenkel      DR2_kenkel      DR3_kenkel      DR4_kenkel      DR5_kenkel      J1_kenkel       J2_kenkel       J3_kenkel       J4_kenkel       J5_kenkel       M132    M145    M150    M1_kenkel       M2_kenkel       M3_kenkel       S18     SRR12363330     SRR12363331
+     SRR12363332     SRR7235981      SRR7235982      SRR7235984      SRR7235985      SRR7235986      SRR7235987      SRR7235988      SRR7236002      SRR7236003      SRR7236007      SRR7236008      SRR7236009      SRR7236010      SRR7236015      SRR7236016      SRR7236017      SRR7236018      SRR7236019      SRR7236020
+OZ034921.1      22025   OZ034921.1_22025_C_A    C       A       .       .       AC=8;AF=0.039604;CM=0;NS=101;AN=202;MAF=0.039604;AC_Het=8;AC_Hom=0;AC_Hemi=0;HWE=1;ExcHet=0.865893      GT      0|0     0|0     0|0     0|0
+     0|0     0|0     0|1     0|0     0|0     0|1     0|0     0|0     1|0     1|0     0|0     0|0     0|0     0|0     0|0     0|0     0|0     0|0     0|0     0|0     0|0     0|0     0|0     0|0     0|0     0|0     0|0
+     0|0     0|0     0|0     0|0     0|0     0|0     0|1     0|1     0|0     0|0     0|0     0|0     0|0     0|0     0|0     0|0     0|0     0|0     0|0     0|0     0|0     0|0     0|0     0|0     0|0     0|0     0|0
+
+### head of map
+OZ034921.1      ps0     0.0     0
+OZ034921.1      ps29651 0.0     29651
+OZ034921.1      ps59301 0.0     59301
+OZ034921.1      ps88952 0.0     88952
+OZ034921.1      ps118603        0.0     118603
+OZ034921.1      ps148253        0.0     148253
+OZ034921.1      ps177904        0.0     177904
+OZ034921.1      ps207555        0.0     207555
+OZ034921.1      ps237205        0.0     237205
+OZ034921.1      ps266856        0.0     266856
+OZ034921.1      ps296507        0.0     296507
+OZ034921.1      ps326158        0.0     326158
+OZ034921.1      ps355808        0.0     355808
+OZ034921.1      ps385459        0.0     385459
+OZ034921.1      ps415110        0.0     415110
+OZ034921.1      ps444760        0.0     444760
+
+#####################################################################################
+######################################## Step 1
+
+# generating index for genome and formatting ref panel
+module load legacy/CentOS7 gcc/11.3.0 samtools/1.17
+samtools faidx GCA_964030605.1_jaAcrPala1.1_genomic.fna
+
+#path to reference and index:
+/project/ckenkel_26/RefSeqs/ApalGenome/ApalmGenome_vSanger/GCA_964030605.1/GCA_964030605.1_jaAcrPala1.1_genomic.fna
+
+# imputation reference panel - reference_panel_111824.vcf from nick - note does not contain mito, should contain info required based on convo with Nick
+
+#### Min Qual Control
+
+- no need to rename - everything is already in OZ0 format
+- will remove rare variants (AC threshold) or at least check - YES step 2
+- everything appears to be in biallelic format, Nick already said includes only SNPs and INDELs so will not rescreen for that
+- will align variants to ref genome to confirm REF allele matches reference and remove any duplicate variants (yes step 5)
+- remove any spurious multiallelic records generated during remap (yes step 6)
+- remove sites with missing data (yes step 7)
+
+mamba activate /project/ckenkel_26/condaEnvs/beagle
+
+#then submit each of the following as consecutive jobs (no need to thread)
+
+# First must split reference vcf by chromosome
+bcftools index reference_panel_111824.vcf.gz
+bcftools index -s reference_panel_111824.vcf.gz | cut -f 1 | while read C; do bcftools view -O z -o splitRef.${C}.vcf.gz reference_panel_111824.vcf.gz "${C}" ; done
+
+# Multiple processing commands piped together
+for CHR in `cat CHR_list.txt`; do
+    bcftools view -e 'INFO/AC<3 | INFO/AN-INFO/AC<3' -Ou splitRef.${CHR}.vcf.gz | \
+    bcftools norm -m -any -Ou | \
+    bcftools norm -f GCA_964030605.1/GCA_964030605.1_jaAcrPala1.1_genomic.fna -d none -Ou | \
+    bcftools view -m 2 -M 2 -Ou | \
+    bcftools view -g ^miss -Oz -o filt_split_reference_panel_111824.${CHR}.vcf.gz
+done
+
+# Just a few re-alignments here, most left alone but will continue with other processing steps
+# IF multiallelic sites are present, preserve them by setting ID field with unique IDs
+
+for CHR in `cat CHR_list.txt`; do
+    bcftools annotate \
+    --set-id '%CHROM\_%POS\_%REF\_%ALT' \
+    filt_split_reference_panel_111824.${CHR}.vcf.gz  \
+    -Oz -o SNPID_filt_split_reference_panel_111824.${CHR}.vcf.gz
+done
+
+# Remove duplicate IDs
+
+for CHR in `cat CHR_list.txt`; do
+    bcftools query -f '%ID\n' SNPID_filt_split_reference_panel_111824.${CHR}.vcf.gz | \
+    sort | uniq -d > SNPID_filt_split_reference_panel_111824.${CHR}.dup_id
+
+    if [[ -s SNPID_filt_split_reference_panel_111824.${CHR}.dup_id ]]; then
+    	bcftools view -e ID=@SNPID_filt_split_reference_panel_111824.${CHR}.dup_id \
+    	SNPID_filt_split_reference_panel_111824.${CHR}.vcf.gz \
+        -Oz -o prune_SNPID_filt_split_reference_panel_111824.${CHR}.vcf.gz
+    else 
+    	mv SNPID_filt_split_reference_panel_111824.${CHR}.vcf.gz \
+        prune_SNPID_filt_split_reference_panel_111824.${CHR}.vcf.gz
+    fi
+done
+
+#okay, all dup ids are empty (as expected since Nick filtered well)
+
+# Generate a tab-delimited file of ref panel allele frequencies
+
+# Check if the VCF does NOT contain AF in the INFO field,
+# and calculate it with bcftools +fill-tags plugin
+
+for CHR in `cat CHR_list.txt`; do
+    bcftools +fill-tags \
+        prune_SNPID_filt_split_reference_panel_111824.${CHR}.vcf.gz \
+        -Oz -o plusAF_prune_SNPID_filt_split_reference_panel_111824.${CHR}.vcf.gz -- -t AF
+done
+
+# then extract desired fields and combine as single output
+
+# Generate a tab-delimited header
+echo -e 'CHR\tSNP\tREF\tALT\tAF' \
+    > reference_panel_111824_imputation_all.frq
+
+# Query the required fields from the VCF file 
+# and append to the allele frequency file 
+for CHR in `cat CHR_list.txt`; do
+    bcftools query \
+    -f '%CHROM\t%CHROM\_%POS\_%REF\_%ALT\t%REF\t%ALT\t%INFO/AF\n' \
+    plusAF_prune_SNPID_filt_split_reference_panel_111824.${CHR}.vcf.gz \
+    >> reference_panel_111824_imputation_all.frq
+done
+
+#grab beagle 4 software to reformat ref panel for bref format
+
+wget https://faculty.washington.edu/browning/beagle/bref.27Jan18.7e1.jar
+
+# Convert each file to bref format
+for CHR in `cat CHR_list.txt`; do
+    java -jar /project/ckenkel_26/RefSeqs/bref.27Jan18.7e1.jar \
+        plusAF_prune_SNPID_filt_split_reference_panel_111824.${CHR}.vcf.gz
+done
+
+# generate list of sample IDs, assuming all files contain same samples
+bcftools query -l plusAF_prune_SNPID_filt_split_reference_panel_111824.OZ034921.1.vcf.gz > reference_panel_111824_sample_IDs.txt
+
+#NOW clean up and remove some of the intermediates
+
+###################################################### Step 2
+
+mamba activate /project/ckenkel_26/condaEnvs/beagle
+
+#input files and additional filtering
+
+############################# sbatch filtVCF.sh
+## only autosomal chromosomes kept for imputation
+
+DATASET=ApalShal_merge150sam.allLoci.ann
+# A comma-separated string of chrs to keep
+chrs=$(echo "OZ034921.1,OZ034922.1,OZ034923.1,OZ034924.1,OZ034925.1,OZ034926.1,OZ034927.1,OZ034928.1,OZ034929.1,OZ034930.1,OZ034931.1,OZ034932.1,OZ034933.1,OZ034934.1")
+
+# Keep only those wanted chromosomes
+bcftools view -t $chrs ${DATASET}.vcf.gz \
+    -Oz -o ${DATASET}_chrfiltered.vcf.gz
+
+### align and correct for any ref/alt flips
+FASTA=/project/ckenkel_26/RefSeqs/ApalGenome/ApalmGenome_vSanger/GCA_964030605.1/GCA_964030605.1_jaAcrPala1.1_genomic.fna
+
+# Align the alleles to the reference genome, 
+# and keep only biallelic records
+bcftools norm -f ${FASTA} -c ws \
+    ${DATASET}_chrfiltered.vcf.gz -Ou | \
+bcftools view -m 2 -M 2 \
+    -Oz -o ${DATASET}_refcorrected.vcf.gz
+
+# Replace the ID column with a CHR_POS_REF_ALT
+bcftools annotate \
+    --set-id '%CHROM\_%POS\_%REF\_%ALT' \
+    ${DATASET}_refcorrected.vcf.gz \
+    -Oz -o ${DATASET}_SNPID.vcf.gz
+
+############################
+note for above, first round of ID annotation didn't work well...why? changed syntax? should check that. ALSO I don't think MAC=0 variants are removed below
+
+############################# sbatch filtDups.sh
+## filter for duplicate individuals and duplicate variants and remove invariant sites
+
+## NOTE IDs are not teh same between panel and the dataset so the protocol cannot be followed as outlined. Alas for coral naming conventions
+## that being said, Nick annotated all our samples as "kenkel" so I can see which genets are in/out of the panel and to my knowledge only AP66_kenkel would overlap, but that dude was excluded already from the sample set so no need to worry there I believe...
+
+DATASET=ApalShal_merge150sam.allLoci.ann
+PANEL_ID=/project/ckenkel_26/RefSeqs/ApalGenome/ApalmGenome_vSanger/reference_panel_111824_sample_IDs.txt
+
+# Copy the panel sample ID file with 
+# a different name to the working directory
+cp ${PANEL_ID} duplicate_sample_IDs.txt
+
+# Generate a list of chip data sample IDs, 
+# keep only duplicates and 
+# append to the list of panel sample IDs
+bcftools query -l ${DATASET}_SNPID.vcf.gz | \
+    uniq -d >> duplicate_sample_IDs.txt
+
+# Exclude duplicate samples and MAC=0 variants, 
+# and update AF value after sample removals.
+# Finally, exclude duplicate variants
+bcftools view -c 1 -c 1:nonmajor -S ^duplicate_sample_IDs.txt \ ######## added in -c flag for MAC=0 variants
+   --force-samples ${DATASET}_SNPID.vcf.gz -Ou | \    ### also noticed error to input file here, going back to base
+bcftools +fill-tags -Ou -- -t AC,AN,AF | \
+bcftools norm -d none \
+    -Oz -o ${DATASET}_noduplicate_variants.vcf.gz
+
+############################
+
+############################# sbatch filtRare.sh
+## exclude rare variants
+
+DATASET=ApalShal_merge150sam.allLoci.ann
+
+# Remove low allele count variants 
+# (redundant if they are already removed)
+bcftools view -e 'INFO/AC<3 | (INFO/AN-INFO/AC)<3' \
+    ${DATASET}_noduplicate_variants.vcf.gz \
+    -Oz -o ${DATASET}_AF.vcf.gz
+
+############################
+
+############################# sbatch filtMulti.sh
+## exclude multi-allelic variants
+
+DATASET=ApalShal_merge150sam.allLoci.ann
+
+# Extract and retain SNPs with AT MOST 2 alleles 
+
+bcftools view -M2 -v snps \
+    ${DATASET}_AF.vcf.gz \
+    -Oz -o ${DATASET}_noMulti.vcf.gz
+
+
+#################################################
+#### imputation with genotype likelihood instead of hard call
+#################################################
+
+mamba activate /project/ckenkel_26/condaEnvs/beagle
+
+#begin with this file:
+
+ApalShal_merge150sam.allLoci.ann_noMulti.vcf.gz
+
+tabix -h ApalShal_merge150sam.allLoci.ann_noMulti.vcf.gz
+
+#### split our sequencing samples by CHRomosome: split.sh
+# where chromOZ.txt is just array config file by 14 major chromosomes
+
+export config=/scratch1/ckenkel/ApalWGS/Expt/GLtest/chromOZ.txt
+export CHR=$(awk -v ArrayTaskID=$SLURM_ARRAY_TASK_ID '$1==ArrayTaskID {print $2}' $config)
+
+
+# split into single vcf by chromosome (done to speed up processing time)
+bcftools view -r $CHR -W=tbi -o $CHR'_ApalShal_merge150sam.allLoci.ann_noMulti.vcf.gz' ApalShal_merge150sam.allLoci.ann_noMulti.vcf.gz
+
+
+
+################################################# beagleRealign.sh - now use Beagle 4.1 to update GL based on hap panel and map
+
+export config=/scratch1/ckenkel/ApalWGS/Expt/GLtest/chromOZ.txt
+export CHR=$(awk -v ArrayTaskID=$SLURM_ARRAY_TASK_ID '$1==ArrayTaskID {print $2}' $config)
+
+BEAGLE_PATH=/project/ckenkel_26/software
+REFERENCE_BREF=/project/ckenkel_26/RefSeqs/ApalGenome/ApalmGenome_vSanger/
+
+# Run for each chromosome and give a long time - like 18 hrs
+    java -Xss5m -Xmx16g \
+      -jar ${BEAGLE_PATH}/beagle.27Jan18.7e1.jar \
+        gl=${CHR}_ApalShal_merge150sam.allLoci.ann_noMulti.vcf.gz \
+	gprobs=true \
+        ref=${REFERENCE_BREF}plusAF_prune_SNPID_filt_split_reference_panel_111824.${CHR}.bref \
+        map=/project/ckenkel_26/RefSeqs/ApalGenome/ApalmGenome_vSanger/Apalmata_SEXAVG.map \
+        window=2000 \
+	overlap=200 \
+	out=${CHR}_GL_allLoci_realign
+        
+
+################################################# GPfilt.sh - now filter based on recalibrated  GP for high confidence calls (>=0.99)
+# AND must get it to be dynamic and change genotype calls to missing for individual samples based on this filter, NOT just tossing site for all samples as some do pass
+# see https://github.com/samtools/bcftools/issues/1134 
+# will go with high threshold for now as this will exclude and then lead to reimputation of lower confidence sites (note imputation worked really well for homozygote calls in first trial)
+
+export config=/scratch1/ckenkel/ApalWGS/Expt/GLtest/chromOZ.txt
+export CHR=$(awk -v ArrayTaskID=$SLURM_ARRAY_TASK_ID '$1==ArrayTaskID {print $2}' $config)
+
+    
+##Pre-imputation filter: GP >= 0.99 (or exclude GP < 0.99) - set genotypes who do not pass filter to missing
+
+tabix -h ${CHR}_GL_allLoci_realign.vcf.gz
+
+bcftools +setGT ${CHR}_GL_allLoci_realign.vcf.gz -W=tbi -Oz -o ${CHR}_GL_allLoci_realign_IGP099.vcf.gz -- -t q -n . -e'FORMAT/GP>=0.99' #IT WORKS!!!
+
+
+################################################# make reference bref3 format. 
+
+#Download .jar file 
+
+cd /project/ckenkel_26/software
+
+wget https://faculty.washington.edu/browning/beagle/bref3.27Feb25.75f.jar
+
+cd /project/ckenkel_26/RefSeqs/ApalGenome/ApalmGenome_vSanger
+
+#append to the end of job.sh
+
+for CHR in `cat CHRlistOG.txt`; do
+    java -jar /project/ckenkel_26/software/bref3.27Feb25.75f.jar \
+    plusAF_prune_SNPID_filt_split_reference_panel_111824.${CHR}.vcf.gz > plusAF_prune_SNPID_filt_split_reference_panel_111824.${CHR}.bref3
+done
+
+################################################# beagle5impute.sh #now use beagle v5.4 to impute from the high confidence calls
+
+##Genotype imputation: Beagle GT - note that beagle v5.4 is what is installed in the conda envt I set up already...should just be able to call
+
+
+export config=/scratch1/ckenkel/ApalWGS/Expt/GLtest/chromOZ.txt
+export CHR=$(awk -v ArrayTaskID=$SLURM_ARRAY_TASK_ID '$1==ArrayTaskID {print $2}' $config)
+
+REFERENCE_BREF=/project/ckenkel_26/RefSeqs/ApalGenome/ApalmGenome_vSanger/
+
+# Run imputation for each chromosome
+	beagle \
+        gt=${CHR}_GL_allLoci_realign_IGP099.vcf.gz \
+        ref=${REFERENCE_BREF}plusAF_prune_SNPID_filt_split_reference_panel_111824.${CHR}.bref3 \
+        map=/project/ckenkel_26/RefSeqs/ApalGenome/ApalmGenome_vSanger/Apalmata_SEXAVG.map \
+        out=${CHR}_GL_allLoci_realign_IGP099_IMP \
+        ne=10000 \
+        impute=true \
+        gp=true \
+        seed=-99999 
+
+################################################
+########### Application of DR2>0.99 of post-imputation filtering thresholds ############
+################################################
+
+
+################################################# filter to retain only calls with high DR2, >=0.99 , set rest of calls to missing
+#DRfiltFinal.sh
+
+
+##Post-imputation filter: DR2 >= 0.99 (or exclude DR2 < 0.99)
+## note i made error in beagle 5 output specification above so file suffix is stupid. delete double vcf.gz when you do it
+
+#tabix -h ${CHR}_GL_allLoci_realign_IGP099_IMP.vcf.gz.vcf.gz
+
+bcftools filter -e 'INFO/DR2<0.99' ${CHR}_GL_allLoci_realign_IGP099_IMP.vcf.gz.vcf.gz -W=tbi -Oz -o ${CHR}_GL_allLoci_realign_IGP099_IMP_DR2099.vcf.gz
+
+#example of how to filter for FORMAT column to set specific genotypes to missing IF desired...
+#bcftools +setGT ${CHR}_GL_allLoci_realign_IGP099_IMP.vcf.gz.vcf.gz -W=tbi -Oz -o ${CHR}_GL_allLoci_realign_IGP099_IMP_DR2099.vcf.gz -- -t q -n . -e'FORMAT/GP>=0.99' 
+
+##################################################
+#### Finally - GWAS with relatedness matrix!
+#################################################
+
+############
+
+Qs:
+################# 1. what is format of relatedness matrix? seems like it just takes an ordered matrix or ind 1 2 list...will need to redo this with unique samples and no clones/parents w/o trait data - copying steps from above and restricting to just desired sample subset
+
+################################################# Just bring AP66 back
+#Samples to brign back: 
+
+21073D-02-29_S165_L003
+
+cd /scratch1/ckenkel/ApalWGS/Haplotype/vcfSanger/
+
+nano SamplesKING.txt # cut out all but 2-29 and save as SamplesKINGuniq.txt
+
+################# KINGsub.sh #pull out samples we care about
+
+export config=/scratch1/ckenkel/ApalWGS/Haplotype/vcfSanger/chromOZ.txt
+export CHR=$(awk -v ArrayTaskID=$SLURM_ARRAY_TASK_ID '$1==ArrayTaskID {print $2}' $config)
+
+bcftools view -S SamplesKINGuniq.txt $CHR'_ApalHap.SNPid.vcf.gz' -W=tbi -o $CHR'_ApalHap.KINGuniqSamp.vcf.gz' 
+
+
+################# KINGmerge.sh #back in /Expt/GLtest directory
+
+# pivot to merging by chromosome THEN reconcatenating
+
+export config=/scratch1/ckenkel/ApalWGS/Expt/vcfSanger/chromOZ.txt
+export CHR=$(awk -v ArrayTaskID=$SLURM_ARRAY_TASK_ID '$1==ArrayTaskID {print $2}' $config)
+
+export HARDCALL=/scratch1/ckenkel/ApalWGS/Haplotype/vcfSanger/
+
+# merge shallow and HiCo vcfs into single vcf by chromosome (done to speed up processing time)
+
+bcftools merge ${CHR}_GL_allLoci_realign_IGP099_IMP_DR2099.vcf.gz ${HARDCALL}${CHR}_ApalHap.KINGuniqSamp.vcf.gz -m both -i IDV:sum,DP:sum,DP4:sum,AD:sum,MQ:avg -W=tbi -Oz -o ${CHR}_AllCHR_ExptIMPfilt_plus66_Merge.vcf.gz
+
+# worked! but lots of missingness (as expected) though KING doesn't really seem to care (says no prefiltering) so will forge ahead
+
+################# KINGfilt.sh 
+
+export config=/scratch1/ckenkel/ApalWGS/Expt/vcfSanger/chromOZ.txt
+export CHR=$(awk -v ArrayTaskID=$SLURM_ARRAY_TASK_ID '$1==ArrayTaskID {print $2}' $config)
+
+FASTA=/project/ckenkel_26/RefSeqs/ApalGenome/ApalmGenome_vSanger/GCA_964030605.1/GCA_964030605.1_jaAcrPala1.1_genomic.fna
+
+# drop low allele count variants (noninformative)
+# Align the alleles to the reference genome, 
+# and keep only biallelic records
+bcftools view -e 'INFO/AC<3 | (INFO/AN-INFO/AC)<3' ${CHR}_AllCHR_ExptIMPfilt_plus66_Merge.vcf.gz -Ou | \
+bcftools norm -f ${FASTA} -c ws -Ou | \
+bcftools view -m 2 -M 2 -W=tbi -Oz -o ${CHR}_AllCHR_ExptIMPfilt_plus66_Merge_Filt.vcf.gz
+
+
+
+################# KINGcat.sh #concatenate before generating bed file
+
+# make list of files to merge and remove header line
+ls *_AllCHR_ExptIMPfilt_plus66_Merge_Filt.vcf.gz > cat_list3
+
+
+
+# merge chromosome vcfs into single vcf
+bcftools concat -f cat_list3 -W=tbi -Oz -o AllCHR_ExptIMPfilt_plus66_Merge_Filt.vcf.gz
+
+
+
+
+####################
+#ConvertBED.sh
+# required input is plink binary format # make a version that is just shallow offspring and one that is also with adults and clones 
+# might be good to compare outcomes of both, "informed" and "not informed"
+
+module load plink2/alpha-6.5
+
+plink2 --vcf AllCHR_ExptIMPfilt_plus66_Merge_Filt_dummyID.vcf.gz --make-bed --out AllCHR_ExptIMPfilt_plus66_Merge_Filt_dummyID_binary_fileset
+
+####################
+
+#append phenotype info to fam file (see GEMMA manual) https://www.xzlab.org/software/GEMMAmanual.pdf and associated stats script for generating ordered list of traits in various qq normalized, binary etc format. In our case, columns of interest are as follows:
+[1] "seqID"       "cross"       "sampleID"    "Genet"       "meanD"       "normD"       "propDead"   
+ [8] "normMort"    "meanSAc"     "normSAc"     "meanSAh"     "percSA"      "percSAnorm"  "D_3bins"    
+[15] "D_binary"    "Mort_bins"   "Mort_binary"
+
+scp Phenotypes.tab ckenkel@hpc-transfer1.usc.edu:/scratch1/ckenkel/ApalWGS/Expt/GLtest
+
+
+#KINest.sh
+# run KING via plink2 to generate relatedness matrix for GEMMA input (note GEMMA can take id id value format) 
+
+plink2 --bfile AllCHR_ExptIMPfilt_plus66_Merge_Filt_dummyID_binary_fileset --make-king-table #done
+
+#rename generic output
+mv plink2.king AllCHR_ExptIMPfilt_plus66_Merge_Filt_dummyID_binary_fileset_KINGrelate.matrix
+
+mv plink2.kin0 AllCHR_ExptIMPfilt_plus66_Merge_Filt_dummyID_binary_fileset_KINGrelate.tab
+
+#then chop up input for gemma
+#must add self comparisons to KING pairwise list, using max KING relatedness max kinship = 0.443 to fulfill format requirements of gemma (check for your own dataset!)
+
+#first, generate self-comparison list, then append to table output
+
+cat Phenotypes.tab | awk '{print $1 "\t" $1 "\t" '0.443'}' > Self_kin.tab
+
+cat AllCHR_ExptIMPfilt_plus66_Merge_Filt_dummyID_binary_fileset_KINGrelate_GEMMA.tab Self_kin.tab > AllCHR_ExptIMPfilt_plus66_Merge_Filt_dummyID_binary_fileset_KINGrelate_GEMMA_plusSelfs.tab
+
+cat AllCHR_ExptIMPfilt_plus66_Merge_Filt_dummyID_binary_fileset_KINGrelate_GEMMA_plusSelfs.tab | cut -f 1 | sort | uniq | wc -l #getting 151 good 
+
+
+####
+2. how to normalize traits (and what traits)? lots of issues here....my trait data does not easily become normal - approxmiates a binomial or ordinal more closely...may not use GEMMA for this analysis as I think lmm is not appropriate in this case
+
+
+#### now to install gemma!
+
+wget https://github.com/genetics-statistics/GEMMA/releases/download/v0.98.5/gemma-0.98.5-linux-static-AMD64.gz
+
+gunzip gemma-0.98.5-linux-static-AMD64.gz 
+
+mv gemma-0.98.5-linux-static-AMD64 gemma
+
+chmod 700 gemma
+
+#note trying to run gemma on login node leads to errors - attempt to run this on compute node instead bc of threading requirement
+
+salloc --time=2:00:00 --cpus-per-task=1 --mem=32G
+
+#add temp path for gemma executable to bashrc then source bashrc
+
+cd /scratch1/ckenkel/ApalWGS/Expt/GLtest
+
+gemma -h #works on interactive node!! sick
+
+### okay - lets give it a go with Durusdinium as binary
+
+############################## filtering for LD using Zach Fuller's defaults and a more stringent LD correlation (= more SNPs retained)
+
+salloc --time=2:00:00 --cpus-per-task=1 --mem=32G
+
+module load plink2/alpha-6.5
+
+plink2 --allow-extra-chr --geno 0.10 --indep-pairwise 200 20 .97 --maf 0.05 --out pruneList97 --set-missing-var-ids @:#[Apal] --vcf AllCHR_ExptIMPfilt_plus66_Merge_Filt.vcf.gz
+
+--indep-pairwise <window size>['kb'] [step size (variant ct)] <unphased-hardcall-r^2 threshold>
+
+# now use to use the list of sites to keep to generate BED file
+
+plink2 --vcf AllCHR_ExptIMPfilt_plus66_Merge_Filt.vcf.gz --extract pruneList97.prune.in --make-bed --out AllCHR_ExptIMPfilt_plus66_Merge_Filt_LD97_binary_fileset
+
+### generate variant without LD filtering for fine mappings
+
+plink2 --allow-extra-chr --geno 0.10 --maf 0.05  --set-missing-var-ids @:#[Apal] --vcf AllCHR_ExptIMPfilt_plus66_Merge_Filt.vcf.gz --make-bed --out AllCHR_ExptIMPfilt_plus66_Merge_Filt_NoLD_binary_fileset
+
+
+# regenerating phenotype fams - scp Phenotypes.tab to HPC
+#then on HPC
+
+cat Phenotypes.tab | cut -f5,6,7,8,9,10,11,12,13,14,15,16,17 > Phenotypes_traitsOnly.tab
+
+paste AllCHR_ExptIMPfilt_plus66_Merge_Filt_LD97_binary_fileset.fam Phenotypes_traitsOnly.tab > tmp.fam
+
+#set NA to -9 for missing format in GEMMA and , try with just 6th column as trait of interest due to error in gemma reading fam file
+cat tmp.fam | sed 's/NA/-9/g' | cut -f1,2,3,4,5,12 > tmp2.fam #17 = D_binary, 19 = Mort_binary, 15=percSAnorm, 11=normSAc
+
+head tmp2.fam #cross ref with R table
+
+#rewrite og fam file
+mv tmp2.fam AllCHR_ExptIMPfilt_plus66_Merge_Filt_LD97_binary_fileset.fam
+
+### and make SNP annotations file, in format SNPid, position, chromosome
+
+cat AllCHR_ExptIMPfilt_plus66_Merge_Filt_LD97_binary_fileset.bim | awk -F'\t' '{print $2,$4,$1}' OFS=',' > AllCHR_ExptIMPfilt_plus66_Merge_Filt_LD97_binary_fileset_SNPs.csv
+
+#### GEMMA - will run durusdinium and mortality and binary; SA growth as continuous as transform does not clobber ranks so badly
+#include Durusdinium covariate for host survival/growth as needed
+
+cat Phenotypes_traitsOnly.tab | cut -f11 | awk '{print "1\t" $0 }' > Dbinary_cov.tab
+
+
+### lets see if this fixes things...yay works!
+
+salloc --time=2:00:00 --cpus-per-task=1 --mem=32G
+
+gemma -bfile AllCHR_ExptIMPfilt_plus66_Merge_Filt_LD97_binary_fileset -k AllCHR_ExptIMPfilt_plus66_Merge_Filt_dummyID_binary_fileset_KINGrelate_GEMMA_plusSelfs.tab -km 2 -a AllCHR_ExptIMPfilt_plus66_Merge_Filt_LD97_binary_fileset_SNPs.csv -lmm 4 -maf 0.05 -miss 0.1 -hwe 1e-7 -o Apal.lmm.Dbinary.MAF005.MISS01.HWEe07.LDfilt97
+
+**** WARNING: Matrix G has 4 eigenvalues close to zero #warning can result from high relatedness
+pve estimate =0.171052 
+#approximately 17.1% of the observed phenotypic variation is estimated to be explained by the genetic information in your dataset.
+se(pve) =0.0925012 #standard error of pve estimate
+
+gemma -bfile AllCHR_ExptIMPfilt_plus66_Merge_Filt_NoLD_binary_fileset -k AllCHR_ExptIMPfilt_plus66_Merge_Filt_dummyID_binary_fileset_KINGrelate_GEMMA_plusSelfs.tab -km 2 -a AllCHR_ExptIMPfilt_plus66_Merge_Filt_NoLD_binary_fileset_SNPs.csv -lmm 4 -maf 0.05 -miss 0.1 -hwe 1e-7 -o Apal.lmm.Dbinary.MAF005.MISS01.HWEe07.NoLD
+
+
+#MORT BINARY - regenerate .fam file with appropriate column of interest above and then
+
+gemma -bfile AllCHR_ExptIMPfilt_plus66_Merge_Filt_LD97_binary_fileset -k AllCHR_ExptIMPfilt_plus66_Merge_Filt_dummyID_binary_fileset_KINGrelate_GEMMA_plusSelfs.tab -km 2 -a AllCHR_ExptIMPfilt_plus66_Merge_Filt_LD97_binary_fileset_SNPs.csv -c Dbinary_cov.tab -lmm 4 -maf 0.05 -miss 0.1 -hwe 1e-7 -o Apal.lmm.MortBinary.MAF005.MISS01.HWEe07.LDfilt97
+
+**** WARNING: Matrix G has 4 eigenvalues close to zero
+pve estimate =0.130512
+se(pve) =0.108121
+
+gemma -bfile AllCHR_ExptIMPfilt_plus66_Merge_Filt_NoLD_binary_fileset -k AllCHR_ExptIMPfilt_plus66_Merge_Filt_dummyID_binary_fileset_KINGrelate_GEMMA_plusSelfs.tab -km 2 -a AllCHR_ExptIMPfilt_plus66_Merge_Filt_NoLD_binary_fileset_SNPs.csv -lmm 4 -maf 0.05 -miss 0.1 -hwe 1e-7 -o Apal.lmm.MortBinary.MAF005.MISS01.HWEe07.NoLD
+
+#percSAnorm - regenerate .fam file with appropriate column of interest above and then
+
+gemma -bfile AllCHR_ExptIMPfilt_plus66_Merge_Filt_LD97_binary_fileset -k AllCHR_ExptIMPfilt_plus66_Merge_Filt_dummyID_binary_fileset_KINGrelate_GEMMA_plusSelfs.tab -km 2 -a AllCHR_ExptIMPfilt_plus66_Merge_Filt_LD97_binary_fileset_SNPs.csv -c Dbinary_cov.tab -lmm 4 -maf 0.05 -miss 0.1 -hwe 1e-7 -o Apal.lmm.percSAnorm.MAF005.MISS01.HWEe07.LDfilt97
+
+**** WARNING: Matrix G has 4 eigenvalues close to zero
+pve estimate =0.116427
+se(pve) =0.0955111
+
+gemma -bfile AllCHR_ExptIMPfilt_plus66_Merge_Filt_NoLD_binary_fileset -k AllCHR_ExptIMPfilt_plus66_Merge_Filt_dummyID_binary_fileset_KINGrelate_GEMMA_plusSelfs.tab -km 2 -a AllCHR_ExptIMPfilt_plus66_Merge_Filt_NoLD_binary_fileset_SNPs.csv -lmm 4 -maf 0.05 -miss 0.1 -hwe 1e-7 -o Apal.lmm.percSAnorm.MAF005.MISS01.HWEe07.NoLD
+
+#normSAc - regenerate .fam file with appropriate column of interest above and then
+
+gemma -bfile AllCHR_ExptIMPfilt_plus66_Merge_Filt_LD97_binary_fileset -k AllCHR_ExptIMPfilt_plus66_Merge_Filt_dummyID_binary_fileset_KINGrelate_GEMMA_plusSelfs.tab -km 2 -a AllCHR_ExptIMPfilt_plus66_Merge_Filt_LD97_binary_fileset_SNPs.csv -c Dbinary_cov.tab -lmm 4 -maf 0.05 -miss 0.1 -hwe 1e-7 -o Apal.lmm.normSAc.MAF005.MISS01.HWEe07.LDfilt97
+
+**** WARNING: Matrix G has 4 eigenvalues close to zero
+pve estimate =0.218162
+se(pve) =0.106424
+
+gemma -bfile AllCHR_ExptIMPfilt_plus66_Merge_Filt_NoLD_binary_fileset -k AllCHR_ExptIMPfilt_plus66_Merge_Filt_dummyID_binary_fileset_KINGrelate_GEMMA_plusSelfs.tab -km 2 -a AllCHR_ExptIMPfilt_plus66_Merge_Filt_NoLD_binary_fileset_SNPs.csv -lmm 4 -maf 0.05 -miss 0.1 -hwe 1e-7 -o Apal.lmm.normSAc.MAF005.MISS01.HWEe07.NoLD
+
+############ Now pull down to local machine and explore outputs in R
+
+scp ckenkel@hpc-transfer1.usc.edu:/scratch1/ckenkel/ApalWGS/Expt/GLtest/output/\*assoc.txt .
+
+
+##### final step, export pairwise LD for all SNPs for fine mapping by chromosome
+
+
+plink2 --allow-extra-chr --geno 0.10 --indep-pairwise 200 20 0.999 --maf 0.05 -hwe 1e-7 --out pruneListMaxSNPs --set-missing-var-ids @:#[Apal] --vcf AllCHR_ExptIMPfilt_plus66_Merge_Filt.vcf.gz
+
+plink2 --vcf AllCHR_ExptIMPfilt_plus66_Merge_Filt.vcf.gz --extract pruneListAllFilts.prune.in --make-bed --out AllCHR_ExptIMPfilt_plus66_Merge_AllFilts_GRAB_binary_fileset
+
+plink --allow-extra-chr --ld-window 999999 --ld-window-kb 100 --ld-window-r2 0 --out ld_decay --r2 --extract pruneListAllFilts.prune.in --vcf AllCHR_ExptIMPfilt_plus66_Merge_Filt.vcf.gz
+
+
+################## FINALLY finally pull vcf for SNPs of interest to plot vs trait values (validation sanity check)
+
+salloc --time=2:00:00 --cpus-per-task=1 --mem=16G
+
+mamba activate /project2/ckenkel_26/NEWFILES/ckenkel_tmp/condaEnvs/beagle
+
+#paste following into SNPlist 
+
+## Top SNPs for Proportion Durusdinium on each Chromosome: 
+OZ034921.1_20692798_A_G
+OZ034923.1_5270789_T_G
+OZ034925.1_15139321_G_T
+OZ034928.1_10054549_A_G
+OZ034934.1_2468289_T_A
+
+## Top SNPs for Mortality on each Chromosome: 
+OZ034924.1_21695075_T_C
+OZ034925.1_468027_T_C
+OZ034927.1_778568_A_G
+OZ034934.1_8778027_G_T 
+
+## Top SNPs for surface area growth in control: 
+OZ034924.1_8657809_A_T
+OZ034924.1_19139343_C_T
+
+## Top SNPs for perc SA growth in heat: 
+OZ034924.1_20154249_C_T
+OZ034924.1_13288405_C_T #######
+OZ034928.1_15596629_A_C
+
+bcftools view -i 'ID=@snp_list.txt' AllCHR_ExptIMPfilt_plus66_Merge_Filt.vcf.gz > GWAS_SNPsOfInterest.vcf.gz
+
+bcftools query -f '%CHROM\t%POS\t%ID\t%REF\t%ALT[\t%SAMPLE=%GT]\n' GWAS_SNPsOfInterest.vcf.gz > genotypes_SNPsOfInterest.txt
+
+#scp down vcf.gz file and integrate with trait data to plot (trait plots R script)
