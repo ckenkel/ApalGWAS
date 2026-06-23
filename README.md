@@ -7,14 +7,12 @@ Files in this repository
 1. Apal_GWAS.txt: Annotated bioinformatic workflow for genotyping and imputation (including read QC, filtering and genotype calls) and GWAS (accounting for relatedness and dominant endosymbiont type). Custom shell scripts used for the genotyping and two-step imputation pipeline can be found in the sister repository at https://github.com/ckenkel/ApalConGen while additional shell scripts used for GWAS analysis are listed below. Installation instructions are given for other published softwares. Note that this pipeline was written for a cluster which uses a SLURM scheduler. 
 	- Additional Shell Scripts specific to GWAS analysis:
 	  - KINGsub.sh
-	  - KINGmerge.sh
 	  - KINGfilt.sh
 	  - KINGcat.sh
 	  - ConvertBED.sh
 	  - KINest.sh
 	  - KINGmerge.sh
 	  - KINGrename.sh
-	  - KINest.sh
 	  
 	- Input files:
 	  - SamplesKINGuniq.txt
