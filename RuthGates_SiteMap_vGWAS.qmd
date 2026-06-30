@@ -62,12 +62,12 @@ coastline10 <- ne_download(
 #Elbow: 25.1415 N 80.2623 W
 #Looe: 24.54609 N 81.40576 W
 #Horseshoe: 25.1399° N, 80.2946° W
-#Sand Island: 25.018267 -80.368417 25.500073°N 80.183415°W
+#Sand Island: 25.018267 -80.368417 
 #Brewster: 25.566436° N, -80.099466° W
 #IC2R3 Nursery: 24.6617° N, -81.4554° W
 
-(crosses <- data.frame(longitude = c(-80.2623, -81.40576, -80.2946, -80.183415, -80.099466), latitude = c(25.1415, 
-    24.54609,25.1399, 25.500073,25.566436)))
+(crosses <- data.frame(longitude = c(-80.2623, -81.40576, -80.2946, -80.368417, -80.099466), latitude = c(25.1415, 
+    24.54609,25.1399, 25.018267,25.566436)))
 crosses
 
 (LKbi <- data.frame(longitude = c(-81.40576), latitude = c( 24.54609)))
@@ -76,7 +76,7 @@ LKbi
 (EB <- data.frame(longitude = c(-80.2623,-80.099466), latitude = c( 25.1415, 25.566436)))
 EB
 
-(EHSI <- data.frame(longitude = c(-80.2946,-80.183415), latitude = c( 25.1399, 25.500073)))
+(EHSI <- data.frame(longitude = c(-80.2946,-80.368417), latitude = c( 25.1399, 25.018267)))
 EHSI
 
 (nursery <- data.frame(longitude = c(-81.4554), latitude = c(24.6617)))
@@ -123,13 +123,13 @@ ggplot(data = coastline10) + #adjust map selection here
 #Elbow: 25.1415 N 80.2623 W
 #Looe: 24.54609 N 81.40576 W
 #Horseshoe: 25.1399° N, 80.2946° W
-#Sand Island: 25.018267 -80.368417 25.500073°N 80.183415°W
+#Sand Island: 25.018267 -80.368417
 #Brewster: 25.566436° N, -80.099466° W
 #Dave's Ledge	24.53051	-81.48734
 #Eastern Dry Rocks	24.45948	-81.84412
 #IC2R3 Nursery: 24.6617° N, -81.4554° W
 
-Miami <- data.frame(state = rep("Florida", 1), city = c("Miami","Elbow","Looe Key","Horseshoe","Sand Is","Brewster","Dave's Ledge","Eastern Dry Rocks","IC2R3 Nursery"), lat = c(25.7616798,25.1415,24.54609,25.1399, 25.500073,25.566436,24.53051,24.45948,24.6617), lng = c(-80.1917902,-80.2623,-81.40576,-80.2946,-80.183415, -80.099466,-81.48734,-81.84412,-81.4554))
+Miami <- data.frame(state = rep("Florida", 1), city = c("Miami","Elbow","Looe Key","Horseshoe","Sand Is","Brewster","Dave's Ledge","Eastern Dry Rocks","IC2R3 Nursery"), lat = c(25.7616798,25.1415,24.54609,25.1399, 25.018267,25.566436,24.53051,24.45948,24.6617), lng = c(-80.1917902,-80.2623,-81.40576,-80.2946,-80.368417, -80.099466,-81.48734,-81.84412,-81.4554))
 
 (Miami <- st_as_sf(Miami, coords = c("lng", "lat"), remove = FALSE, 
     crs = 4326, agr = "constant"))
@@ -172,7 +172,6 @@ ggplot(data = coastline10) +
     coord_sf(xlim = c(-88, -78), ylim = c(24, 34), expand = FALSE)
 
 ```
-
 
 ## Raceway Temperature Ramp Profiles - read in and QC
 
