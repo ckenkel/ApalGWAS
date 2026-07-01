@@ -514,6 +514,7 @@ bcftools filter -e 'INFO/DR2<0.99' ${CHR}_GL_allLoci_realign_IGP099_IMP.vcf.gz.v
 #example of how to filter for FORMAT column to set specific genotypes to missing IF desired...
 #bcftools +setGT ${CHR}_GL_allLoci_realign_IGP099_IMP.vcf.gz.vcf.gz -W=tbi -Oz -o ${CHR}_GL_allLoci_realign_IGP099_IMP_DR2099.vcf.gz -- -t q -n . -e'FORMAT/GP>=0.99' 
 
+
 ##################################################
 #### Finally - GWAS with relatedness matrix!
 #################################################
@@ -580,8 +581,6 @@ ls *_AllCHR_ExptIMPfilt_plus66_Merge_Filt.vcf.gz > cat_list3
 
 # merge chromosome vcfs into single vcf
 bcftools concat -f cat_list3 -W=tbi -Oz -o AllCHR_ExptIMPfilt_plus66_Merge_Filt.vcf.gz
-
-
 
 
 ####################

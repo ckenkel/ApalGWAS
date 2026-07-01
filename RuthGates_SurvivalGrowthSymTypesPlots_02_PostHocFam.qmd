@@ -1,0 +1,600 @@
+---
+title: "Ruth Gates Analysis and Figures Part 2: Plots"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Load all of the needed libraries.
+
+```{r}
+
+#install.packages("vcfR")
+
+# Graphical tools :
+library(ggplot2)
+library(cowplot)
+#library(nationalparkcolors)
+
+# Data Wrangling :
+library(dplyr)
+library(tidyr)
+library(forcats)
+library(car)
+library(vcfR)
+
+```
+
+##Load in the quality filtered trait data and integrated symbiont type datasets
+
+```{r}
+
+traitsFiltered_SymTypeSubset<-readRDS(file="~/Dropbox/CarlsLab/ResearchProjects/NOAA_RuthGates/TraitData/traitsFiltered_SymTypeSubset_PostHocFam.rds")
+
+summary(traitsFiltered_SymTypeSubset)
+
+```
+
+Note, Racks are nested within tanks as random effects and genets are within families. To focus on cross effects Must create data subset with 3 high replication Batch Cross Origins to ask about diffs in variance among crosses
+
+```{r}
+
+traitsAllCrossSym <- traitsFiltered_SymTypeSubset %>%
+  filter(Origin_PostHoc=="E-B Batch Cross A" | Origin_PostHoc=="E-B Batch Cross B" | Origin_PostHoc=="E-B Batch Cross C" | Origin_PostHoc=="LK3 x LK10 Biparental Cross" | Origin_PostHoc=="E-H-SI Batch Cross") %>%
+  droplevels()
+
+summary(traitsAllCrossSym)
+
+```
+
+## Sym Type Plots
+
+```{r}
+
+GenetOrder<-traitsAllCrossSym %>%                   #get ordered vector of genets
+  filter(Treatment=="Control") %>%
+  group_by(Genet) %>%
+  summarise(meanD=mean(X.D,na.rm=TRUE)) %>%
+  arrange(by_group=meanD) %>%
+  pull(Genet) 
+
+#Plots of symbiont type abundance rank ordered by %Durisdinium in Control ramets
+
+traitsAllCrossSym$Genet<-factor(traitsAllCrossSym$Genet,levels=GenetOrder)
+
+levels(traitsAllCrossSym$Genet)
+
+dev.new()
+traitsAllCrossSym %>% #biparental cross appears to be more D dominated??
+  ggplot(aes(x = Genet, y = X.D,color=Treatment,fill=Treatment)) + 
+  geom_boxplot() +
+  scale_color_manual(values=c("#56B4E9","#D55E00")) + ##009E73
+  scale_fill_manual(values=c("#56B4E9","#D55E00")) +
+  ylab("Proportion Durusdinium")+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  facet_grid(~Origin_PostHoc,scales="free_x",drop=TRUE,space="free")
+
+traitsAllCrossSym %>% #just for funsies - lets look at proportion A ordered by D
+  ggplot(aes(x = Genet, y = X.A,color=Treatment,fill=Treatment)) + 
+  geom_boxplot() +
+  scale_color_manual(values=c("#56B4E9","#D55E00")) + ##0072B2
+  scale_fill_manual(values=c("#56B4E9","#D55E00")) +
+  ylab("Proportion Symbiodinium")+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  facet_grid(~Origin_PostHoc,scales="free_x",drop=TRUE,space="free")
+
+#yeah - very cool - almost mirror image, and A loses in heat
+
+traitsAllCrossSym %>% #All C oddballs are in Elbow-Horseshoe-Sand Island
+  ggplot(aes(x = Genet, y = X.C,color=Treatment,fill=Treatment)) + 
+  geom_boxplot() +
+  scale_color_manual(values=c("#56B4E9","#D55E00")) + ##E69F00
+  scale_fill_manual(values=c("#56B4E9","#D55E00")) +
+  ylab("Proportion Cladodopium")+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  facet_grid(~Origin_PostHoc,scales="free_x",drop=TRUE,space="free")
+
+```
+
+## SA growth and Partial mortality
+
+```{r}
+
+traitsAllCrossSym$SA_nonzero<-ifelse(traitsAllCrossSym$SA_dif_cor > 0, 1, 0)
+
+ggplot(traitsAllCrossSym, aes(Treatment, SA_dif_cor, colour = as.factor(SA_nonzero))) + geom_jitter() #does appear to be treatment effect
+
+ggplot(traitsAllCrossSym, aes(Origin_PostHoc, SA_dif_cor, colour = as.factor(SA_nonzero))) + geom_jitter() #does appear to be origin effect
+
+ggplot(traitsAllCrossSym, aes(Treatment, SA_dif_cor, colour = as.factor(SA_nonzero))) + geom_jitter()+facet_wrap(~Origin_PostHoc) #not really interaction
+
+traitsAllCrossSym %>% #no real patter by sym type as expected
+  ggplot(aes(x = Genet, y = SA_dif_cor,color=Treatment)) + 
+  geom_boxplot() +
+  scale_color_manual(values=c("coral","pink")) +
+  labs(x = "Genet", y = expression(paste("Change in Surface Area (", mm^2,")")))+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  facet_grid(~Origin_PostHoc,scales="free_x",drop=TRUE,space="free")
+
+dev.new()
+sub<-traitsAllCrossSym %>% #layer on boxplot of just positive growth
+  filter(SA_nonzero>0)
+ #color points by zeros so you can see distinction with zero inflation
+  ggplot(traitsAllCrossSym, aes(x = Treatment, y = SA_dif_cor)) +
+  geom_jitter(aes(colour=as.factor(SA_nonzero)),size=0.7)+
+  scale_color_manual(values=c("#D55E00","grey80"),guide="none") +
+  geom_boxplot(data=sub,outlier.shape = NA,alpha=0.1) +
+  labs(x = "Treatment", y = expression(paste("Change in Surface Area (", mm^2,")")))+
+  theme_bw()+
+#  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  facet_grid(~Origin_PostHoc,scales="free_x",drop=TRUE,space="free")
+ 
+
+############################ Partial mortality
+  
+traitsAllCrossSym$PM_nonzero<-ifelse(traitsAllCrossSym$PartMort > 0, 1, 0)
+
+ggplot(traitsAllCrossSym, aes(Treatment, PartMort, colour = as.factor(PM_nonzero))) + geom_jitter() +   scale_color_manual(values=c("grey60","red"),guide="none")+labs(x = "Treatment", y = expression(paste("Partial Mortality (", mm^2,")")))+theme_bw() #def treatment effect
+
+ggplot(traitsAllCrossSym, aes(Origin_PostHoc, PartMort, colour = as.factor(PM_nonzero))) + geom_jitter() +   scale_color_manual(values=c("grey60","red"),guide="none")+theme_bw()#origin effect not clear
+
+ggplot(traitsAllCrossSym, aes(Treatment, PartMort, colour = as.factor(PM_nonzero))) + geom_jitter()+   scale_color_manual(values=c("grey60","red"),guide="none")+labs(x = "Treatment", y = expression(paste("Partial Mortality (", mm^2,")")))+theme_bw()+facet_wrap(~Origin_PostHoc) #complete separation
+
+heats<-traitsAllCrossSym %>%
+  filter(Treatment=="Heat") %>%
+  droplevels()
+
+levels(heats$Genet) #good, still in Durusdinium order
+
+sub2<-heats %>% #layer on boxplot of just positive SA
+  filter(PartMort>0)
+
+heats %>% #no real patter by sym type as expected
+  ggplot(aes(x = Genet, y = PartMort)) + 
+  geom_jitter(aes(colour=as.factor(PM_nonzero)))+
+  scale_color_manual(values=c("grey60","red"),guide="none") +
+  geom_boxplot(data=sub2,outlier.shape = NA,alpha=0.1) +
+  labs(x = "Genet", y = expression(paste("Partial Mortality in Heat (", mm^2,")")))+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  facet_grid(~Origin_PostHoc,scales="free_x",drop=TRUE,space="free")
+
+
+```
+
+## S:H cell ratio, buoyant weight, Photophysiology
+
+```{r}
+
+#Plots of S:H cell ratio ordered by %Durisdinium in Control ramets
+
+traitsAllCrossSym %>% 
+  mutate(log_SHT=log10(SH_T)) %>%
+  ggplot(aes(x = Genet, y = log_SHT)) + 
+  geom_boxplot() +
+#  scale_color_manual(values=c("coral","pink")) +
+  labs(x = "Genet", y = "Log10(S:H Cell Ratio)")+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  facet_grid(~Origin_PostHoc,scales="free_x",drop=TRUE,space="free")
+
+#What if we plot by D bins for visualization purposes
+traitsAllCrossSym$D_bins<-cut(traitsAllCrossSym$X.D,
+                  breaks=c(0,0.1,0.9,1),
+                  labels=c('negligible','transitional','dominant')) #defining transitional as more than 10% and less than 90%
+
+traitsAllCrossSym %>% 
+  mutate(log_SHT=log10(SH_T)) %>%
+  drop_na(D_bins) %>%
+  ggplot(aes(x = Origin_PostHoc, y = log_SHT, colour = as.factor(Origin))) + 
+  geom_boxplot() +
+#  scale_color_manual(values=c("coral","pink")) +
+  labs(x = "Batch Cross Origin", y = "Log10(S:H Cell Ratio)")+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  facet_grid(~D_bins,scales="free_x",drop=TRUE,space="free")
+
+
+#### Daily Growth Rate
+traitsAllCrossSym %>% 
+  ggplot(aes(x = Origin_PostHoc, y = DailyGrowthRate_cor)) + 
+  geom_boxplot() +
+#  scale_color_manual(values=c("coral","pink")) +
+  labs(x = "Origin", y = "Daily Weight Gain (g/day)")+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+#Plots of S:H cell ratio ordered by %Durisdinium in Control ramets
+
+traitsAllCrossSym %>% #not a clear pattern by genet...some outliers?
+  ggplot(aes(x = Genet, y = SH_T,color=Treatment)) + 
+  geom_boxplot() +
+  scale_color_manual(values=c("black","grey60")) +
+  scale_x_discrete(limits=GenetOrder)+
+  ylab("S:H Cell Ratio")+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  facet_wrap(~Origin_PostHoc)
+
+#Plots of Proportional Change in FvFm ordered by %Durisdinium in Control ramets
+traitsAllCrossSym %>% 
+  ggplot(aes(x = Genet, y = FvFm_PropDif,color=Treatment)) + 
+  geom_boxplot() +
+  scale_color_manual(values=c("coral","pink")) +
+  labs(x = "Genet", y = "Proportional Change in Fv/Fm")+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  facet_grid(~Origin_PostHoc,scales="free_x",drop=TRUE,space="free")
+
+#Plots of Final NPQ ordered by %Durisdinium in Control ramets
+traitsAllCrossSym %>% 
+  ggplot(aes(x = Genet, y = NPQ_Final_withNA,color=Treatment)) + 
+  geom_boxplot() +
+  scale_color_manual(values=c("coral","pink")) +
+  labs(x = "Genet", y = "Final NPQ")+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  facet_grid(~Origin,scales="free_x",drop=TRUE,space="free")
+
+
+#Plots of Proportional Change in ETRmax ordered by %Durisdinium in Control ramets
+traitsAllCrossSym %>% 
+  ggplot(aes(x = Genet, y = ETR.Max_PropDif,color=Treatment)) + 
+  geom_boxplot() +
+  scale_color_manual(values=c("coral","pink")) +
+  labs(x = "Genet", y = "Proportional Change in ETRmax")+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  facet_grid(~Origin,scales="free_x",drop=TRUE,space="free")
+
+```
+
+## Survival Data - need to calculate Genet Hazard Ratio and treat as trait
+
+```{r}
+
+########### Mean Mortality
+
+GenetOrder<-traitsAllCrossSym %>%                   #get ordered vector of genets by mean Ramet Mortality
+  filter(Treatment=="Heat") %>%
+  group_by(Genet) %>%
+  summarise(meanMort=mean(Mortality,na.rm=TRUE)) %>%
+  arrange(by_group=meanMort) %>%
+  pull(Genet) 
+
+#Plot of Mean Mortality by treatment and origin rank ordered by Mortality in heat
+
+traitsAllCrossSym %>%                                         #Get some survivors in all; could ask if survival differs by cross type IF genet specific score is hard to estimate...the LK cross again looks pretty good
+  ggplot(aes(x = Genet, y = Mortality,color=Treatment)) + 
+  geom_boxplot() +
+  scale_color_manual(values=c("black","grey60")) +
+  scale_x_discrete(limits=GenetOrder)+
+  ylab("Mean Mortality")+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  facet_wrap(~Origin_PostHoc)
+
+############ what about relationship with %Durusdinium
+
+#what about proportion Durusdinium - not super informative visualization bc of strong genet effects
+GenetOrder<-traitsFiltered_SymTypeSubset %>%                   #get ordered vector of genets
+  filter(Treatment=="Control") %>%
+  group_by(Genet) %>%
+  summarise(meanD=mean(X.D,na.rm=TRUE)) %>%
+  arrange(by_group=meanD) %>%
+  pull(Genet) 
+
+#Plots of average ramet mortality rank ordered by %Durisdinium in Control ramets 
+#MIGHT be more complete mortality in genets without Durusdinium?? might be easier to see with Genet Hazard Ratio
+
+traitsFiltered_SymTypeSubset %>%
+  ggplot(aes(x = Genet, y = Mortality,color=Treatment)) + 
+  geom_boxplot() +
+  scale_color_manual(values=c("coral","pink")) +
+  scale_x_discrete(limits=GenetOrder)+
+  ylab("Complete Mortality")+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+```
+
+Finally, sanity check SNPs of interest by plotting trait values by Genotype Dosage
+
+```{r}
+#first re-generate relevant traits by genet
+
+ByGenetD<-traitsFiltered_SymTypeSubset %>%                   #get ordered vector of genets
+  group_by(Genet) %>%
+  summarise(meanD=mean(X.D,na.rm=TRUE))
+
+
+ByGenetMort<-traitsFiltered_SymTypeSubset %>%                    #get ordered vector of genets
+  filter(Treatment=="Heat") %>%
+  group_by(Genet) %>%
+  summarise(propDead = mean(Mortality))
+
+ByGenetSAc<-traitsFiltered_SymTypeSubset %>%                    #get ordered vector of genets
+  filter(Treatment=="Control") %>%
+  group_by(Genet) %>%
+  summarise(meanSAc = mean(SA_dif_cor,na.rm=TRUE))
+
+ByGenetSAh<-traitsFiltered_SymTypeSubset %>%                    #get ordered vector of genets
+  filter(Treatment=="Heat") %>%
+  group_by(Genet) %>%
+  summarise(meanSAh = mean(SA_dif_cor,na.rm=TRUE))
+
+ByGenetSA<-full_join(ByGenetSAc,ByGenetSAh) 
+
+summary(ByGenetSA)
+
+
+ByGenetSA$percSA<-(ByGenetSA$meanSAh/ByGenetSA$meanSAc) #create value representing mean proportion of SA growth maintained in heat by a given genet. 1 = no change by treatment
+
+ByGenetA<-full_join(ByGenetD,ByGenetMort) 
+
+ByGenet<-full_join(ByGenetA,ByGenetSA)
+
+head(ByGenet)
+tail(ByGenet)
+
+
+ids=read.csv("~/Dropbox/CarlsLab/ResearchProjects/NOAA_RuthGates/GenomeAnalysis/RelatednessKey_PostHocFam.csv",stringsAsFactors=TRUE) # read in sample name key
+nrow(ids)
+head(ids)
+
+ids<-ids[,c(1,3,4,5)]
+
+names(ids)<-c("seqID","cross" , "sampleID","Genet")
+
+head(ids)
+str(ids)
+
+ids$Genet<-as.factor(ids$Genet)
+
+ByGenetAnnot<-full_join(ids,ByGenet, by="Genet")
+
+head(ByGenetAnnot)
+str(ByGenetAnnot)
+summary(ByGenetAnnot)
+
+ByGenetAnnot %>%
+  filter(is.na(Genet)) #good - just missing wild adult traits
+
+#obtain sample order from vcf/.fam file
+order<-c('21073D-03-01_S46_L003',	'21073D-03-02_S75_L005',	'21073D-03-03_S76_L005',	'21073D-03-04_S77_L005',	'21073D-03-05_S47_L003',	'21073D-03-06_S78_L005',	'21073D-03-07_S48_L003',	'21073D-03-08_S79_L005',	'21073D-03-100_S118_L003',	'21073D-03-101_S99_L005',	'21073D-03-102_S100_L005',	'21073D-03-103_S101_L005',	'21073D-03-104_S102_L005',	'21073D-03-105_S119_L003',	'21073D-03-106_S120_L003',	'21073D-03-107_S121_L003',	'21073D-03-108_S122_L003',	'21073D-03-109_S123_L003',	'21073D-03-10_S49_L003',	'21073D-03-110_S124_L003',	'21073D-03-111_S125_L003',	'21073D-03-112_S126_L003',	'21073D-03-113_S127_L003',	'21073D-03-114_S128_L003',	'21073D-03-115_S129_L003',	'21073D-03-116_S130_L003',	'21073D-03-117_S131_L003',	'21073D-03-118_S132_L003',	'21073D-03-119_S133_L003',	'21073D-03-11_S50_L003',	'21073D-03-120_S134_L003',	'21073D-03-121_S135_L003',	'21073D-03-122_S136_L003',	'21073D-03-123_S137_L003',	'21073D-03-124_S138_L003',	'21073D-03-125_S139_L003',	'21073D-03-126_S140_L003',	'21073D-03-127_S141_L003',	'21073D-03-128_S142_L003',	'21073D-03-129_S143_L003',	'21073D-03-12_S80_L005',	'21073D-03-130_S144_L003',	'21073D-03-131_S145_L003',	'21073D-03-132_S146_L003',	'21073D-03-133_S147_L003',	'21073D-03-134_S148_L003',	'21073D-03-135_S149_L003',	'21073D-03-136_S150_L003',	'21073D-03-137_S151_L003',	'21073D-03-138_S152_L003',	'21073D-03-139_S153_L003',	'21073D-03-140_S103_L005',	'21073D-03-141_S104_L005',	'21073D-03-142_S154_L003',	'21073D-03-143_S105_L005',	'21073D-03-144_S155_L003',	'21073D-03-145_S106_L005',	'21073D-03-146_S107_L005',	'21073D-03-147_S156_L003',	'21073D-03-148_S108_L005',	'21073D-03-149_S109_L005',	'21073D-03-14_S51_L003',	'21073D-03-150_S110_L005',	'21073D-03-152_S111_L005',	'21073D-03-153_S129_L006',	'21073D-03-154_S157_L003',	'21073D-03-155_S158_L003',	'21073D-03-156_S159_L003',	'21073D-03-157_S160_L003',	'21073D-03-15_S52_L003',	'21073D-03-16_S53_L003',	'21073D-03-17_S85_L005','21073D-03-18_S54_L003',	'21073D-03-19_S86_L005',	'21073D-03-20_S55_L003',	'21073D-03-21_S81_L005',	'21073D-03-23_S56_L003','21073D-03-24_S57_L003',	'21073D-03-25_S58_L003',	'21073D-03-26_S59_L003',	'21073D-03-27_S60_L003',	'21073D-03-28_S61_L003',	'21073D-03-30_S63_L003',	'21073D-03-31_S64_L003',	'21073D-03-32_S82_L005',	'21073D-03-33_S65_L003',	'21073D-03-34_S66_L003',	'21073D-03-35_S67_L003',	'21073D-03-36_S68_L003',	'21073D-03-37_S69_L003',	'21073D-03-38_S70_L003',	'21073D-03-39_S71_L003',	'21073D-03-40_S72_L003',	'21073D-03-41_S73_L003',	'21073D-03-42_S74_L003',	'21073D-03-43_S75_L003',	'21073D-03-44_S76_L003',	'21073D-03-45_S77_L003',	'21073D-03-46_S78_L003',	'21073D-03-47_S79_L003',	'21073D-03-49_S80_L003',	'21073D-03-51_S81_L003',	'21073D-03-52_S82_L003',	'21073D-03-53_S83_L003',	'21073D-03-54_S84_L003',	'21073D-03-55_S85_L003',	'21073D-03-56_S86_L003',	'21073D-03-57_S87_L003',	'21073D-03-58_S90_L005',	'21073D-03-59_S88_L003',	'21073D-03-60_S89_L003',	'21073D-03-61_S90_L003',	'21073D-03-62_S91_L003',	'21073D-03-63_S92_L003',	'21073D-03-64_S93_L003',	'21073D-03-65_S94_L003',	'21073D-03-66_S91_L005',	'21073D-03-67_S95_L003',	'21073D-03-68_S96_L003',	'21073D-03-69_S97_L003',	'21073D-03-70_S98_L003',	'21073D-03-71_S99_L003',	'21073D-03-72_S100_L003',	'21073D-03-73_S101_L003',	'21073D-03-74_S102_L003',	'21073D-03-75_S103_L003',	'21073D-03-76_S104_L003',	'21073D-03-77_S105_L003',	'21073D-03-78_S106_L003',	'21073D-03-79_S92_L005',	'21073D-03-80_S107_L003',	'21073D-03-81_S108_L003',	'21073D-03-82_S93_L005',	'21073D-03-83_S94_L005',	'21073D-03-84_S109_L003',	'21073D-03-85_S110_L003',	'21073D-03-86_S111_L003',	'21073D-03-87_S95_L005',	'21073D-03-88_S112_L003',	'21073D-03-89_S113_L003',	'21073D-03-90_S96_L005',	'21073D-03-91_S97_L005',	'21073D-03-92_S98_L005',	'21073D-03-93_S114_L003',	'21073D-03-94_S115_L003',	'21073D-03-95_S116_L003',	'21073D-03-96_S117_L003',	'21073D-03-97_S161_L003',	'21073D-03-98_S162_L003',	'21073D-03-99_S163_L003',	'21073D-02-29_S165_L003')
+
+order<-as.data.frame(order)
+
+rownames(order)<-order$order
+
+rownames(ByGenetAnnot)<-ByGenetAnnot$seqID
+
+ByGenetAnnot<-ByGenetAnnot[rownames(order),]
+
+ByGenetAnnot$seqID
+
+names(ByGenetAnnot)
+
+summary(ByGenetAnnot) 
+
+#OKAY now have trait dataset with seqID annotation, final step is to add in genotype columns for SNPs of interest by seqID
+
+vcf_file <- "~/Dropbox/CarlsLab/ResearchProjects/NOAA_RuthGates/GenomeAnalysis/GWAS/GWAS_SNPsOfInterest.vcf.gz"  # Replace with the path to your VCF file
+vcf_data <- read.vcfR(vcf_file, verbose = FALSE) # Set verbose to TRUE to see progress
+
+vcf_tidy <- vcfR2tidy(vcf_data)
+
+head(vcf_tidy$gt)
+
+SNP<-vcf_tidy$gt %>%
+  filter(POS=="19139343") %>% ########################### change position here and run remaining code to plot
+  mutate(gt_GT = as.factor(gt_GT)) %>%
+  mutate(gt_DS = as.factor(gt_DS))
+
+#19139343 for chr 4 and 20692798 for chr 1
+
+summary(SNP)
+
+SNP %>% 
+  filter(is.na(gt_DS)) #error for unphased, need to convert GT myself
+
+SNPsm<-SNP[,c(3,4)]
+
+names(SNPsm)<-c("seqID","GT")
+
+head(SNPsm)
+
+#now merge and add some new format columns!
+
+summary(ByGenetAnnot)
+
+ByGenetAnnotGT<-left_join(ByGenetAnnot, SNPsm, by = c("seqID"))
+
+ByGenetAnnotGT$GT=as.factor(ByGenetAnnotGT$GT)
+
+ByGenetAnnotGT$D_bins<-cut(ByGenetAnnotGT$meanD,
+                  breaks=c(0,0.1,0.9,1),
+                  labels=c('negligible','transitional','dominant'))
+
+ByGenetAnnotGT$D_bins<-factor(ByGenetAnnotGT$D_bins,levels=c('negligible','transitional','dominant'))
+
+head(ByGenetAnnotGT)
+
+ByGenetAnnotGT<-ByGenetAnnotGT %>%
+  mutate(GT_ds=if_else(.$GT == "0|0",0,if_else(.$GT == "0|1",1,if_else(.$GT == "1|0",1,if_else(.$GT == "0/1",1,if_else(.$GT == "1|1",2,if_else(.$GT == "0/0",0,if_else(.$GT == "1/1",2,NA))))))))
+
+ByGenetAnnotGT$GT_ds<-as.factor(ByGenetAnnotGT$GT_ds)
+
+ByGenetAnnotGT %>%
+  filter(is.na(meanD)) #missing trait data, but have genotype
+
+
+#now plot
+
+GenetOrder<-ByGenetAnnotGT %>%                   #get ordered vector of genets
+  arrange(by_group=meanD) %>%
+  pull(Genet) 
+
+#Plots of genotype dosage ordered by mean %Durisdinium 
+
+ByGenetAnnotGT$Genet<-factor(ByGenetAnnotGT$Genet,levels=GenetOrder) #reset levels
+
+levels(ByGenetAnnotGT$Genet) #good
+
+## Plot for focal crosses
+ByGenetAnnotGT_focalCross <- ByGenetAnnotGT %>%
+  filter(!is.na(meanD)) %>%
+  filter(cross=="E-B Batch Cross A" | cross=="E-B Batch Cross B" | cross=="E-B Batch Cross C" | cross=="LK3 x LK10 Biparental Cross" | cross=="E-H-SI Batch Cross") %>%
+  droplevels()
+
+
+summary(ByGenetAnnotGT_focalCross)
+
+##################################################### Prop D only
+ByGenetAnnotGT_focalCross %>% 
+  ggplot(aes(x = GT_ds, y = meanD,color=GT_ds)) + 
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(alpha = 0.8)+
+  scale_color_manual(values=c("#009E73","#009E73","#009E73")) + #"lightgreen","seagreen3","mediumseagreen"
+  ylab("Proportion Durusdinium")+
+  xlab("Genotype Dosage: OZ034924.1_19139343_C_T")+
+  theme_bw()+
+#  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  facet_grid(~cross,drop=TRUE,space="free")+
+  theme(legend.position="none")
+
+##################################################### Prop mortality in heat only
+
+ByGenetAnnotGT_focalCross %>% 
+  ggplot(aes(x = GT_ds, y = propDead,color=GT_ds)) + 
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(height = 0,alpha = 0.8)+
+  scale_color_manual(values=c("darkturquoise","paleturquoise3","paleturquoise")) +
+  ylab("Proportion of Ramet Mortality in Heat")+
+  xlab("Genotype Dosage: OZ034934.1_8778027_G_T")+
+  theme_bw()+
+#  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  facet_grid(~cross,drop=TRUE,space="free")+
+  theme(legend.position="none")
+
+##################################################### SA growth control only
+ByGenetAnnotGT_focalCross %>% 
+  ggplot(aes(x = GT_ds, y = meanSAc,color=GT_ds)) + 
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(height = 0,alpha = 0.8)+
+  scale_color_manual(values=c("darkgoldenrod4","darkgoldenrod","darkgoldenrod3")) + #"darkgoldenrod4","darkgoldenrod2","gold2"
+  ylab("Mean Surface Area Growth in Control")+
+  xlab("Genotype Dosage: OZ034924.1_19139343_C_T")+
+  theme_bw()+
+#  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  facet_grid(~cross,drop=TRUE,space="free")+
+  theme(legend.position="none")
+
+##################################################### relative diff in SA growth only
+ByGenetAnnotGT_focalCross %>% 
+  ggplot(aes(x = GT_ds, y = percSA,color=GT_ds)) + 
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(height = 0,alpha = 0.8)+
+  scale_color_manual(values=c("olivedrab","olivedrab3","olivedrab2")) +
+  ylab("Relative Surface Area Growth in Heat")+
+  xlab("Genotype Dosage: OZ034928.1_15596629_A_C")+
+  theme_bw()+
+#  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  facet_grid(~cross,drop=TRUE,space="free")+
+  theme(legend.position="none")
+
+#Lastly, cross-check genotypes and traits of 4 genets overlapping between Elder 2023 and this study: AP5, 7, 20 and 24
+
+traitsAllCrossSymThe4 <- traitsFiltered_SymTypeSubset %>%
+  filter(Genet=="5" | Genet=="7" | Genet=="20" | Genet=="24") %>%
+  droplevels()
+
+summary(traitsAllCrossSymThe4) #some mortality
+
+## Plot for focal crosses
+ByGenetAnnotGT_The4 <- ByGenetAnnotGT %>%
+  filter(!is.na(meanD)) %>%
+  filter(Genet=="5" | Genet=="7" | Genet=="20" | Genet=="24") %>%
+  droplevels()
+
+summary(ByGenetAnnotGT_The4) #alas, genet 24 did not make it to final dataset due to insufficient yield - got taken out at QC step
+
+ByGenetAnnotGT_The4 #5 and 7 are heterozygotes, 20 is homozygote ref; 
+
+#  seqID              cross sampleID Genet     meanD  propDead   meanSAc    meanSAh    percSA  GT       D_bins GT_ds
+#1 21073D-03-04_S77_L005 E-H-SI Batch Cross   X-AP-5     5 0.9996664 0.6666667 0.3233333 0.17333333 0.5360825 1|0     dominant     1
+#2 21073D-03-06_S78_L005 E-H-SI Batch Cross   X-AP-7     7 0.9998528 0.3333333 0.1800000 0.04000000 0.2222222 0|1     dominant     1
+#3 21073D-03-18_S54_L003 E-H-SI Batch Cross  X-AP-20    20 0.2985475 0.6666667 0.1466667 0.04666667 0.3181818 0|0 transitional     0
+
+##silly fisher exact test for presence of any A at 3 focal sites from field transplant
+dat <- data.frame(
+  "S. fitti present" = c(1, 2),
+  "S. fitti absent" = c(6, 4),
+  row.names = c("G5 or 7 heterozygote", "G20 homozygous reference"),
+  stringsAsFactors = FALSE
+)
+dat
+
+mosaicplot(dat,
+  main = "Mosaic plot OZ034921.1_20692798_A_G",
+  color = TRUE
+) #its higher A in AA genet but probs not sig
+
+fisher.test(dat,alternative="less") #we expect more D in G5/7
+#but not significant as expected
+
+#	Fisher's Exact Test for Count Data
+
+#data:  dat
+#p-value = 0.4371
+#alternative hypothesis: true odds ratio is less than 1
+#95 percent confidence interval:
+ #0.000000 6.075835
+#sample estimates:
+#odds ratio 
+# 0.3634092
+
+##
+ByGenetAnnotGT_The4 %>% 
+  ggplot(aes(x = GT_ds, y = meanD,color=GT_ds)) + 
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(alpha = 0.8)+
+  scale_color_manual(values=c("#009E73","#009E73","#009E73")) + #"lightgreen","seagreen3","mediumseagreen"
+  ylab("Proportion Durusdinium")+
+  xlab("Genotype Dosage: OZ034921.1_20692798_A_G")+
+  theme_bw()+
+#  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  facet_grid(~cross,drop=TRUE,space="free")+
+  theme(legend.position="none")
+
+## !!!!! don't forget to scroll back up to line 412 to change locus of choice for this plot
+ByGenetAnnotGT_The4 %>% 
+  ggplot(aes(x = GT_ds, y = meanSAc,color=GT_ds)) + 
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(height = 0,alpha = 0.8)+
+  scale_color_manual(values=c("darkgoldenrod4","darkgoldenrod","darkgoldenrod3")) + #"darkgoldenrod4","darkgoldenrod2","gold2"
+  ylab("Mean Surface Area Growth in Control")+
+  xlab("Genotype Dosage: OZ034924.1_19139343_C_T")+
+  theme_bw()+
+#  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  facet_grid(~cross,drop=TRUE,space="free")+
+  theme(legend.position="none")
+
+ByGenetAnnotGT_The4 #all 3 are heterozygotes at chr 4 locus and of precisely middle growth in expt...so conforms but not helpful per se
+
+#                  seqID              cross sampleID Genet     meanD  propDead   meanSAc    meanSAh    percSA  GT       D_bins GT_ds
+#1 21073D-03-04_S77_L005 E-H-SI Batch Cross   X-AP-5     5 0.9996664 0.6666667 0.3233333 0.17333333 0.5360825 1|0     dominant     1
+#2 21073D-03-06_S78_L005 E-H-SI Batch Cross   X-AP-7     7 0.9998528 0.3333333 0.1800000 0.04000000 0.2222222 1|0     dominant     1
+#3 21073D-03-18_S54_L003 E-H-SI Batch Cross  X-AP-20    20 0.2985475 0.6666667 0.1466667 0.04666667 0.3181818 0|1 transitional     1
+
+
+```
